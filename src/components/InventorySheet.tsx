@@ -33,7 +33,7 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
   const exportToExcel = () => {
     const dataForExport = halleData.map((row, index) => ({
       "Numéro": row.numero,
-      "Matière": index === 0 ? "PET bocal" : index === 1 ? "Rouleau emballage" : "Bouchons",
+      "Matière": index === 0 ? "PET broyé" : index === 1 ? "Rouleau emballage" : "Bouchons",
       "BB": row.bb,
       "Palette": row.palette
     }));
@@ -301,6 +301,132 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
                       <input type="number" className="w-full" defaultValue={"1078050"} />
                     </td>
                   </tr>
+                  <tr>
+                    <td className="border px-2 py-1">1.04</td>
+                    <td className="border px-2 py-1">
+                      <input type="text" className="w-full" defaultValue={"Carton mixte (900)"} />
+                    </td>
+                    <td className="border px-2 py-1">
+                      <input type="number" className="w-full" defaultValue={"1078050"} />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="border px-2 py-1">1.05</td>
+                    <td className="border px-2 py-1">
+                      <input type="text" className="w-full" defaultValue={"Carton propre (800)"} />
+                    </td>
+                    <td className="border px-2 py-1">
+                      <input type="number" className="w-full" defaultValue={"1078050"} />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="border px-2 py-1">2.06</td>
+                    <td className="border px-2 py-1">
+                      <input type="text" className="w-full" defaultValue={"Écrit couleur n°2 (750)"} />
+                    </td>
+                    <td className="border px-2 py-1">
+                      <input type="number" className="w-full" defaultValue={"1078050"} />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="border px-2 py-1">2.06</td>
+                    <td className="border px-2 py-1">
+                      <input type="text" className="w-full" defaultValue={"Broyé (850)"} />
+                    </td>
+                    <td className="border px-2 py-1">
+                      <input type="number" className="w-full" defaultValue={"1078050"} />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="border px-2 py-1">3.03</td>
+                    <td className="border px-2 py-1">
+                      <input type="text" className="w-full" defaultValue={"Rognures d'imprimerie"} />
+                    </td>
+                    <td className="border px-2 py-1">
+                      <input type="number" className="w-full" defaultValue={"1078050"} />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="border px-2 py-1">3.05</td>
+                    <td className="border px-2 py-1">
+                      <input type="text" className="w-full" defaultValue={"Écrit blanc (750)"} />
+                    </td>
+                    <td className="border px-2 py-1">
+                      <input type="number" className="w-full" defaultValue={"1078050"} />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="border px-2 py-1">3.08</td>
+                    <td className="border px-2 py-1">
+                      <input type="text" className="w-full" defaultValue={"Cellulose (blanche)"} />
+                    </td>
+                    <td className="border px-2 py-1">
+                      <input type="number" className="w-full" defaultValue={"1078050"} />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="border px-2 py-1">3.10</td>
+                    <td className="border px-2 py-1">
+                      <input type="text" className="w-full" defaultValue={"Afnor7 (950)"} />
+                    </td>
+                    <td className="border px-2 py-1">
+                      <input type="number" className="w-full" defaultValue={"1078050"} />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="border px-2 py-1">3.18</td>
+                    <td className="border px-2 py-1">
+                      <input type="text" className="w-full" defaultValue={"Blanc (900)"} />
+                    </td>
+                    <td className="border px-2 py-1">
+                      <input type="number" className="w-full" defaultValue={"1078050"} />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="border px-2 py-1">4.02</td>
+                    <td className="border px-2 py-1">
+                      <input type="text" className="w-full" defaultValue={"Natron (750)"} />
+                    </td>
+                    <td className="border px-2 py-1">
+                      <input type="number" className="w-full" defaultValue={"1078050"} />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="border px-2 py-1">2.02</td>
+                    <td className="border px-2 py-1">
+                      <input type="text" className="w-full" defaultValue={"OJournaux invendus"} />
+                    </td>
+                    <td className="border px-2 py-1">
+                      <input type="number" className="w-full" defaultValue={"1078050"} />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="border px-2 py-1">3.14</td>
+                    <td className="border px-2 py-1">
+                      <input type="text" className="w-full" defaultValue={"Papier blanc journaux"} />
+                    </td>
+                    <td className="border px-2 py-1">
+                      <input type="number" className="w-full" defaultValue={"1078050"} />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="border px-2 py-1">3.17</td>
+                    <td className="border px-2 py-1">
+                      <input type="text" className="w-full" defaultValue={"Rognures journaux"} />
+                    </td>
+                    <td className="border px-2 py-1">
+                      <input type="number" className="w-full" defaultValue={"1078050"} />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="border px-2 py-1">1.04</td>
+                    <td className="border px-2 py-1">
+                      <input type="text" className="w-full" defaultValue={"Marvinpac"} />
+                    </td>
+                    <td className="border px-2 py-1">
+                      <input type="number" className="w-full" defaultValue={"1078050"} />
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -341,6 +467,45 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
                     </td>
                     <td className="border px-2 py-1">
                       <input type="number" className="w-full" defaultValue={""} />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <h2 className="text-lg font-bold mb-4 text-center">EAU (COMPTEUR)</h2>
+              <table className="w-full text-sm">
+                <thead>
+                  <tr>
+                    <th className="border px-2 py-1"></th>
+                    <th className="border px-2 py-1">m³</th>
+                    <th className="border px-2 py-1">Compteur</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="border px-2 py-1">Morgevon 11</td>
+                    <td className="border px-2 py-1">
+                      <input type="number" className="w-full" defaultValue={""} />
+                    </td>
+                    <td className="border px-2 py-1">
+                      <input type="number" className="w-full" defaultValue={"1078050"} />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="border px-2 py-1">Morgevon 13</td>
+                    <td className="border px-2 py-1">
+                      <input type="number" className="w-full" defaultValue={"2354"} />
+                    </td>
+                    <td className="border px-2 py-1">
+                      <input type="number" className="w-full" defaultValue={"563623"} />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="border px-2 py-1">Halle à bois</td>
+                    <td className="border px-2 py-1">
+                      <input type="number" className="w-full" defaultValue={"1727"} />
+                    </td>
+                    <td className="border px-2 py-1">
+                      <input type="number" className="w-full" defaultValue={"780398"} />
                     </td>
                   </tr>
                 </tbody>
