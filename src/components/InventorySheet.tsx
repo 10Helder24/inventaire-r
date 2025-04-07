@@ -414,51 +414,53 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
                 <thead>
                   <tr>
                     <th className="border px-2 py-1">Numéro</th>
-                    <th className="border px-2 py-1">Matières</th>
+                    <th className="border px-2 py-1">Machines</th>
                     <th className="border px-2 py-1">N° de balles</th>
                     <th className="border px-2 py-1">Heures</th>
                   </tr>
                 </thead>
                 <tbody>
                   {[
-                    'Linde pince H45',
-                    'Linde pince H50',
-                    'Linde tour.H25/D600',
-                    'Linde tour.H25/D600',
-                    'Linde transpal.Gerbeur P-F',
-                    'Linde transpal.Gerbeur',
-                    'Toyota fourche',
-                    'Linde H45 tournante',  
-                    'Liebherr 526',
-                    'Palan',
-                    'Grue Fuchs 335 new',
-                    'Grue Liebherr LH22',
-                    'Grue Cat MH3024',
-                    'Compresseur GA 20VSD',
-                    'Compresseur GA 30VSD',
-                    'Aktid convoyeur',
-                    'Forus /F400',
-                    'Forus /BZ396',
-                    'FBroyeur Hammel',
-                    'Tapis bois',
-                    'Presse Pall',
-                    'Titech',
-                    'Linde H50 new',
-                    'Linde New H35',
-                    'Linde New H25',
-                    'Broyeur Satrindtech',
-                    'Linde L12 Atelier'
-                   ].map((matiere) => (
-                    <tr key={matiere}>
+                    { num: '2.0.10', mat: 'Linde pince H45', nbbal: '1078050', nbheur: "" },
+                    { num: '2.0.07', mat: 'Linde pince H50', nbbal: '1078050', nbheur: "" },
+                    { num: '2.0.09', mat: 'Linde tour.H25/D600', nbbal: '1078050', nbheur: "" },
+                    { num: '2.0.08', mat: 'Linde tour.H25/D600', nbbal: '1078050', nbheur: "" },
+                    { num: '2.0.11', mat: 'Linde transpal.Gerbeur P-F', bal: '1078050', nbheur: "" },
+                    { num: '2.0.12', mat: 'Linde transpal.Gerbeur', nbbal: '1078050', nbheur: "" },
+                    { num: '2.0.13', mat: 'Toyota fourche)', nbbal: '1078050', nbheur: "" },
+                    { num: '2.0.40', mat: 'Linde H45 tournante', nbbal: '1078050', nbheur: "" },
+                    { num: '2.0.02', mat: 'Liebherr 526', nbbal: '1078050', nbheur: "" },
+                    { num: '2.0.15', mat: 'Palan', nbbal: '1078050', nbheur: "" },
+                    { num: '2.0.06', mat: 'Grue Fuchs 335 new', nbbal: '1078050', nbheur: "" },
+                    { num: '2.0.38', mat: 'Grue Liebherr LH22', nbbal: '1078050', nbheur: "" },
+                    { num: '2.0.39', mat: 'PGrue Cat MH3024', nbbal: '1078050', nbheur: "" },
+                    { num: '2.0.17', mat: 'Compresseur GA 20 VSD', nbbal: '1078050', nbheur: "" },
+                    { num: '2.0.16', mat: 'Compresseur GA 30 VSD', nbbal: '1078050', nbheur: "" },
+                    { num: '2.0.25', mat: 'Aktid convoyeur', nbbal: '1078050', nbheur: "" },  
+                    { num: '2.0.22', mat: 'Forus/F400', nbbal: '1078050', nbheur: "" },
+                    { num: '2.0.23', mat: 'Forus/BZ396', nbbal: '1078050', nbheur: "" },
+                    { num: '2.0.27', mat: 'Broyeur Hammel', nbbal: '1078050', nbheur: "" },
+                    { num: '2.0.34', mat: 'Tapis Bois', nbbal: '1078050', nbheur: ""},
+                    { num: '2.0.19', mat: 'RPresse Pall', nbbal: '1078050', nbheur: "" },
+                    { num: '2.0.24', mat: 'Titech', nbbal: '1078050', nbheur: "" },
+                    { num: '2.0.05', mat: 'Linde pince H50 new', nbbal: '1078050', nbheur: "" },
+                    { num: '2.0.04', mat: 'Liebherr T60-9 S', nbbal: '1078050', nbheur: "" },
+                    { num: '2.0.42', mat: 'Linde new H35', nbbal: '1078050', nbheur: "" },
+                    { num: '2.0.41', mat: 'Linde new H25', nbbal: '1078050', nbheur: "" },
+                    { num: '2.0.29', mat: 'Broyeur Satrindtech', nbbal: '1078050', nbheur: "" },
+                    { num: '1.2.0.37', mat: 'Linde L12 Atelier', nbbal: '1078050', nbheur: "" }
+                  ].map((item, index) => (
+                    <tr key={index}>
+                      <td className="border px-2 py-1">{item.num}</td>
+                      <input type="text" className="w-full p-1" defaultValue={item.num} />
                       <td className="border px-2 py-1">
-                        <input type="number" className="w-full p-1" />
+                        <input type="text" className="w-full p-1" defaultValue={item.mac} />
                       </td>
-                      <td className="border px-2 py-1">{matiere}</td>
                       <td className="border px-2 py-1">
-                        <input type="number" className="w-full p-1" defaultValue="0" />
+                        <input type="number" className="w-full p-1" defaultValue={item.nbbal} />
                       </td>
                       <td className="border px-2 py-1">
-                        <input type="number" className="w-full p-1" defaultValue="0" />
+                        <input type="number" className="w-full p-1" defaultValue={item.nbheur} />
                       </td>
                     </tr>
                   ))}
