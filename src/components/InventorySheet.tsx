@@ -141,6 +141,22 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
           >
             Autres
           </button>
+          <button
+            onClick={() => setActiveTab('machine')}
+            className={`px-4 py-2 whitespace-nowrap ${
+              activeTab === 'machine' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
+            }`}
+          >
+            Machines de Manutention
+          </button>
+          <button
+            onClick={() => setActiveTab('autres')}
+            className={`px-4 py-2 whitespace-nowrap ${
+              activeTab === 'autres' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
+            }`}
+          >
+            Autres
+          </button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -389,6 +405,65 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
             </div>
           </div>
         </div>
+
+        {/* Section INVENTAIRE OUTILS MACHINES*/}
+          <div className={`border rounded-lg p-4 overflow-x-auto ${activeTab !== 'machine' && 'hidden sm:block'}`}>
+            <h2 className="text-lg font-bold mb-4 text-center">CDT</h2>
+            <div className="min-w-[600px] lg:min-w-0">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr>
+                    <th className="border px-2 py-1">Numéro</th>
+                    <th className="border px-2 py-1">Matières</th>
+                    <th className="border px-2 py-1">N° de balles</th>
+                    <th className="border px-2 py-1">Heures</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    'Linde pince H45',
+                    'Linde pince H50',
+                    'Linde tour.H25/D600',
+                    'Linde tour.H25/D600',
+                    'Linde transpal.Gerbeur P-F',
+                    'Linde transpal.Gerbeur',
+                    'Toyota fourche',
+                    'Linde H45 tournante',  
+                    'Liebherr 526',
+                    'Palan',
+                    'Grue Fuchs 335 new',
+                    'Grue Liebherr LH22',
+                    'Grue Cat MH3024',
+                    'Compresseur GA 20VSD',
+                    'Compresseur GA 30VSD',
+                    'Aktid convoyeur',
+                    'Forus /F400',
+                    'Forus /BZ396',
+                    'FBroyeur Hammel',
+                    'Tapis bois',
+                    'Presse Pall',
+                    'Titech',
+                    'Linde H50 new',
+                    'Linde New H35',
+                    'Linde New H25',
+                    'Broyeur Satrindtech',
+                    'Linde L12 Atelier'
+                  ].map((matiere) => (
+                    <tr key={matiere}>
+                      <td className="border px-2 py-1">{matiere}</td>
+                      <td className="border px-2 py-1">
+                        <input type="number" className="w-full p-1" defaultValue="0" />
+                      </td>
+                      <td className="border px-2 py-1">
+                        <input type="number" className="w-full p-1" defaultValue="0" />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
 
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div>
