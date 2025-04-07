@@ -113,10 +113,10 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
               activeTab === 'inventaire' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
             }`}
           >
-            Plastique en balles
+            CDT
           </button>
           <button
-            onClick={() => setActiveTab('plastique')}
+            onClick={() => setActiveTab('cdt')}
             className={`px-4 py-2 whitespace-nowrap ${
               activeTab === 'plastique' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
             }`}
@@ -183,7 +183,7 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
           </div>
 
           {/* Section INVENTAIRE */}
-          <div className={`border rounded-lg p-4 overflow-x-auto ${activeTab !== 'inventaire' && 'hidden sm:block'}`}>
+          <div className={`border rounded-lg p-4 overflow-x-auto ${activeTab !== 'cdt' && 'hidden sm:block'}`}>
             <h2 className="text-lg font-bold mb-4 text-center">CDT</h2>
             <div className="min-w-[600px] lg:min-w-0">
               <table className="w-full text-sm">
