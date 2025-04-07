@@ -201,7 +201,7 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
 
           {/* Section INVENTAIRE PLastique en balles*/}
           <div className={`border rounded-lg p-4 overflow-x-auto ${activeTab !== 'plastiqueb' && 'hidden sm:block'}`}>
-            <h2 className="text-lg font-bold mb-4 text-center">CDT</h2>
+            <h2 className="text-lg font-bold mb-4 text-center">Plastique en Balles</h2>
             <div className="min-w-[600px] lg:min-w-0">
               <table className="w-full text-sm">
                 <thead>
@@ -277,7 +277,7 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
 
           {/* Section Papier en balle */}
           <div className={`border rounded-lg p-4 overflow-x-auto ${activeTab !== 'papierballes' && 'hidden sm:block'}`}>
-            <h2 className="text-lg font-bold mb-4 text-center">Papier en balle</h2>
+            <h2 className="text-lg font-bold mb-4 text-center">Papier en balles</h2>
             <div className="min-w-[600px] lg:min-w-0">
               <table className="w-full text-sm">
                 <thead>
@@ -406,7 +406,7 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
           </div>
         </div>
 
-        {/* Section INVENTAIRE OUTILS MACHINES*/}
+        {/* Section INVENTAIRE OUTILS & MACHINES*/}
           <div className={`border rounded-lg p-4 overflow-x-auto ${activeTab !== 'machine' && 'hidden sm:block'}`}>
             <h2 className="text-lg font-bold mb-4 text-center">CDT</h2>
             <div className="min-w-[600px] lg:min-w-0">
@@ -450,6 +450,9 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
                     'Linde L12 Atelier'
                   ].map((matiere) => (
                     <tr key={matiere}>
+                      <td className="border px-2 py-1">
+                        <input type="number" className="w-full p-1" />
+                      </td>
                       <td className="border px-2 py-1">{matiere}</td>
                       <td className="border px-2 py-1">
                         <input type="number" className="w-full p-1" defaultValue="0" />
