@@ -108,7 +108,7 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
             Plastique (BB ou PAL)
           </button>
           <button
-            onClick={() => setActiveTab('Plastique bb')}
+            onClick={() => setActiveTab('inventaire')}
             className={`px-4 py-2 whitespace-nowrap ${
               activeTab === 'inventaire' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
             }`}
