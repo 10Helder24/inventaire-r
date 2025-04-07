@@ -7,3 +7,46 @@
     @apply border rounded px-3 py-2;
   }
 }
+
+/* Styles pour les tables responsives */
+@layer components {
+  .table-container {
+    @apply w-full overflow-x-auto -mx-4 sm:mx-0;
+  }
+  
+  .table-wrapper {
+    @apply min-w-full divide-y divide-gray-200;
+  }
+  
+  .table-cell {
+    @apply px-4 py-2 whitespace-nowrap text-sm;
+  }
+  
+  /* Styles pour le scroll horizontal sur mobile */
+  .table-scroll {
+    @apply overflow-x-auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Optimisations pour le mode sombre */
+@media (prefers-color-scheme: dark) {
+  .dark\:bg-gray-900 {
+    @apply bg-gray-900;
+  }
+  
+  .dark\:text-white {
+    @apply text-white;
+  }
+}
+
+/* Optimisations pour les petits écrans */
+@media (max-width: 640px) {
+  .mobile-menu {
+    @apply fixed bottom-0 left-0 right-0 bg-white border-t;
+  }
+  
+  .content-area {
+    @apply pb-16;
+  }
+}
