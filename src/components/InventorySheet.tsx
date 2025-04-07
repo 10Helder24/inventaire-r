@@ -100,25 +100,25 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
         {/* Navigation des onglets mobile */}
         <div className="flex overflow-x-auto mb-4 -mx-4 px-4 sm:hidden">
           <button
-            onClick={() => setActiveTab('halle')}
+            onClick={() => setActiveTab('plastiquebb')}
             className={`px-4 py-2 whitespace-nowrap ${
-              activeTab === 'halle' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
+              activeTab === 'plastiquebb' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
             }`}
           >
             Plastique en BB ou PAL
           </button>
           <button
-            onClick={() => setActiveTab('inventaire')}
+            onClick={() => setActiveTab('cdt')}
             className={`px-4 py-2 whitespace-nowrap ${
-              activeTab === 'inventaire' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
+              activeTab === 'cdt' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
             }`}
           >
             CDT
           </button>
           <button
-            onClick={() => setActiveTab('cdt')}
+            onClick={() => setActiveTab('papierballes')}
             className={`px-4 py-2 whitespace-nowrap ${
-              activeTab === 'cdt' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
+              activeTab === 'papierballes' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
             }`}
           >
             Papier en balles
@@ -135,8 +135,8 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Section INVENTAIRE DE LA HALLE */}
-          <div className={`border rounded-lg p-4 overflow-x-auto ${activeTab !== 'halle' && 'hidden sm:block'}`}>
-            <h2 className="text-lg font-bold mb-4 text-center">INVENTAIRE DE LA HALLE</h2>
+          <div className={`border rounded-lg p-4 overflow-x-auto ${activeTab !== 'plastiquebb' && 'hidden sm:block'}`}>
+            <h2 className="text-lg font-bold mb-4 text-center">PLASTIQUE BB</h2>
             <div className="min-w-[600px] lg:min-w-0">
               <table className="w-full text-sm">
                 <thead>
@@ -183,7 +183,7 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
           </div>
 
           {/* Section INVENTAIRE */}
-          <div className={`border rounded-lg p-4 overflow-x-auto ${activeTab !== 'inventaire' && 'hidden sm:block'}`}>
+          <div className={`border rounded-lg p-4 overflow-x-auto ${activeTab !== 'cdt' && 'hidden sm:block'}`}>
             <h2 className="text-lg font-bold mb-4 text-center">CDT</h2>
             <div className="min-w-[600px] lg:min-w-0">
               <table className="w-full text-sm">
@@ -223,7 +223,7 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
           </div>
 
           {/* Section Plastique en balle */}
-          <div className={`border rounded-lg p-4 overflow-x-auto ${activeTab !== 'plastique' && 'hidden sm:block'}`}>
+          <div className={`border rounded-lg p-4 overflow-x-auto ${activeTab !== 'papierballes' && 'hidden sm:block'}`}>
             <h2 className="text-lg font-bold mb-4 text-center">Papier en balle</h2>
             <div className="min-w-[600px] lg:min-w-0">
               <table className="w-full text-sm">
