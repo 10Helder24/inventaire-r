@@ -13,7 +13,6 @@ export function PublicView({ articles, loading }: PublicViewProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  // Extract unique categories
   const categories = ['all', ...new Set(articles.map(article => article.category))].filter(Boolean);
 
   const filteredArticles = articles.filter(article => {
@@ -55,7 +54,7 @@ export function PublicView({ articles, loading }: PublicViewProps) {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 pt-20 pb-6">
+      <main className="container mx-auto px-4 pt-24 pb-6">
         <div className="bg-white rounded-lg shadow-md p-4 mb-6">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
@@ -68,8 +67,8 @@ export function PublicView({ articles, loading }: PublicViewProps) {
                 className="w-full pl-10 pr-4 py-2 border rounded-md"
               />
             </div>
-            <div className="flex items-center gap-2 min-w-[200px]">
-              <Filter className="h-5 w-5 text-gray-400" />
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <Filter className="h-5 w-5 text-gray-400 flex-shrink-0" />
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
@@ -103,6 +102,7 @@ export function PublicView({ articles, loading }: PublicViewProps) {
                       src={article.image_url}
                       alt={article.name}
                       className="absolute inset-0 w-full h-full object-cover"
+                      loading="lazy"
                     />
                   </div>
                 )}
@@ -110,14 +110,14 @@ export function PublicView({ articles, loading }: PublicViewProps) {
                   <div className="text-xs font-medium text-green-600 mb-1">
                     {article.category || 'Non catégorisé'}
                   </div>
-                  <h3 className="font-medium text-gray-900 mb-1">{article.name}</h3>
-                  <p className="text-sm text-gray-600">Ref: {article.reference || '-'}</p>
-                  <div className="mt-2 flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-900">
+                  <h3 className="font-medium text-gray-900 mb-1 line-clamp-2">{article.name}</h3>
+                  <p className="text-sm text-gray-600 mb-2">Ref: {article.reference || '-'}</p>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-medium text-gray-900">
                       Stock: {article.stock || 0} {article.unit || 'unité(s)'}
                     </span>
                     {article.location && (
-                      <span className="text-xs text-gray-500">
+                      <span className="text-gray-500 truncate ml-2">
                         {article.location}
                       </span>
                     )}
