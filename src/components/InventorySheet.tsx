@@ -102,25 +102,33 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
         {/* Navigation des onglets mobile */}
         <div className="flex overflow-x-auto mb-4 -mx-4 px-4 sm:hidden">
           <button
-            onClick={() => setActiveTab('halle')}
+            onClick={() => setActiveTab('plastiquebb')}
             className={`px-4 py-2 whitespace-nowrap ${
-              activeTab === 'halle' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
+              activeTab === 'plastiquebb' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
             }`}
           >
             Plastique en BB ou PAL
           </button>
           <button
-            onClick={() => setActiveTab('inventaire')}
+            onClick={() => setActiveTab('plastiqueb')}
             className={`px-4 py-2 whitespace-nowrap ${
-              activeTab === 'inventaire' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
+              activeTab === 'plastiqueb' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
             }`}
           >
             Plastique en balles
           </button>
           <button
-            onClick={() => setActiveTab('plastique')}
+            onClick={() => setActiveTab('cdt')}
             className={`px-4 py-2 whitespace-nowrap ${
-              activeTab === 'plastique' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
+              activeTab === 'cdt' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
+            }`}
+          >
+            CDT
+          </button>
+          <button
+            onClick={() => setActiveTab('papierballes')}
+            className={`px-4 py-2 whitespace-nowrap ${
+              activeTab === 'papierballes' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
             }`}
           >
             Papier en balles
@@ -136,8 +144,8 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Section INVENTAIRE DE LA HALLE */}
-          <div className={`border rounded-lg p-3 overflow-x-auto ${activeTab !== 'halle' && 'hidden sm:block'}`}>
+          {/* Section INVENTAIRE Plastique en big bag ou palette */}
+          <div className={`border rounded-lg p-3 overflow-x-auto ${activeTab !== 'plastiquebb' && 'hidden sm:block'}`}>
             <h2 className="text-lg font-bold mb-3 text-center">Plastique en BB</h2>
             <div className="min-w-[600px] lg:min-w-0">
               <table className="w-full text-sm">
@@ -175,8 +183,48 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
             </div>
           </div>
 
-          {/* Section INVENTAIRE */}
-          <div className={`border rounded-lg p-4 overflow-x-auto ${activeTab !== 'inventaire' && 'hidden sm:block'}`}>
+          {/* Section INVENTAIRE PLastique en balles*/}
+          <div className={`border rounded-lg p-4 overflow-x-auto ${activeTab !== 'cdt' && 'hidden sm:block'}`}>
+            <h2 className="text-lg font-bold mb-4 text-center">CDT</h2>
+            <div className="min-w-[600px] lg:min-w-0">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr>
+                    <th className="border px-2 py-1">Matière</th>
+                    <th className="border px-2 py-1">Balles</th>
+                    <th className="border px-2 py-1">Palettes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    'Polyéthyène 98/2',
+                    'Polyéthyène 90/10',
+                    'Canettes Alu (400)',
+                    'Bouteilles de lait (380)',
+                    'Plaque bleu PP',
+                    'Ligatures Strapex',
+                    'Opercule',
+                    'PP',
+                    'PS',
+                    'Pet bouteille (370)'
+                  ].map((matiere) => (
+                    <tr key={matiere}>
+                      <td className="border px-2 py-1">{matiere}</td>
+                      <td className="border px-2 py-1">
+                        <input type="number" className="w-full p-1" defaultValue="0" />
+                      </td>
+                      <td className="border px-2 py-1">
+                        <input type="number" className="w-full p-1" defaultValue="0" />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Section INVENTAIRE CDT*/}
+          <div className={`border rounded-lg p-4 overflow-x-auto ${activeTab !== 'cdt' && 'hidden sm:block'}`}>
             <h2 className="text-lg font-bold mb-4 text-center">CDT</h2>
             <div className="min-w-[600px] lg:min-w-0">
               <table className="w-full text-sm">
@@ -211,8 +259,8 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
             </div>
           </div>
 
-          {/* Section Plastique en balle */}
-          <div className={`border rounded-lg p-4 overflow-x-auto ${activeTab !== 'plastique' && 'hidden sm:block'}`}>
+          {/* Section Papier en balle */}
+          <div className={`border rounded-lg p-4 overflow-x-auto ${activeTab !== 'papierballes' && 'hidden sm:block'}`}>
             <h2 className="text-lg font-bold mb-4 text-center">Papier en balle</h2>
             <div className="min-w-[600px] lg:min-w-0">
               <table className="w-full text-sm">
