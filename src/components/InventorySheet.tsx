@@ -448,11 +448,10 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
                     { num: '2.0.42', mac: 'Linde new H35', nbbal: '1078050', nbheur: "" },
                     { num: '2.0.41', mac: 'Linde new H25', nbbal: '1078050', nbheur: "" },
                     { num: '2.0.29', mac: 'Broyeur Satrindtech', nbbal: '1078050', nbheur: "" },
-                    { num: '1.2.0.37', mac: 'Linde L12 Atelier', nbbal: '1078050', nbheur: "" }
+                    { num: '2.0.37', mac: 'Linde L12 Atelier', nbbal: '1078050', nbheur: "" }
                   ].map((item, index) => (
                     <tr key={index}>
                       <td className="border px-2 py-1">{item.num}</td>
-                      <input type="text" className="w-full p-1" defaultValue={item.num} />
                       <td className="border px-2 py-1">
                         <input type="text" className="w-full p-1" defaultValue={item.mac} />
                       </td>
