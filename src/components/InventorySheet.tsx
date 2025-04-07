@@ -18,9 +18,11 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
 
   // État pour la section INVENTAIRE DE LA HALLE
   const [halleData, setHalleData] = useState([
-    { numero: "", bb: "", palette: "" },
-    { numero: "", bb: "", palette: "10" },
-    { numero: "", bb: "", palette: "0" }
+    { bb: 0, palette: 0 },
+    { bb: 0, palette: 0 },
+    { bb: 0, palette: 0 },
+    { bb: 0, palette: 0 },
+    { bb: 0, palette: 0 },
   ]);
 
   // Fonction de mise à jour pour la section HALLE
@@ -100,25 +102,25 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
         {/* Navigation des onglets mobile */}
         <div className="flex overflow-x-auto mb-4 -mx-4 px-4 sm:hidden">
           <button
-            onClick={() => setActiveTab('plastiquebb')}
+            onClick={() => setActiveTab('halle')}
             className={`px-4 py-2 whitespace-nowrap ${
-              activeTab === 'plastiquebb' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
+              activeTab === 'halle' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
             }`}
           >
             Plastique en BB ou PAL
           </button>
           <button
-            onClick={() => setActiveTab('cdt')}
+            onClick={() => setActiveTab('inventaire')}
             className={`px-4 py-2 whitespace-nowrap ${
-              activeTab === 'cdt' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
+              activeTab === 'inventaire' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
             }`}
           >
-            CDT
+            Plastique en balles
           </button>
           <button
-            onClick={() => setActiveTab('papierballes')}
+            onClick={() => setActiveTab('plastique')}
             className={`px-4 py-2 whitespace-nowrap ${
-              activeTab === 'papierballes' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
+              activeTab === 'plastique' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
             }`}
           >
             Papier en balles
@@ -135,32 +137,23 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Section INVENTAIRE DE LA HALLE */}
-          <div className={`border rounded-lg p-4 overflow-x-auto ${activeTab !== 'plastiquebb' && 'hidden sm:block'}`}>
-            <h2 className="text-lg font-bold mb-4 text-center">PLASTIQUE BB</h2>
+          <div className={`border rounded-lg p-3 overflow-x-auto ${activeTab !== 'halle' && 'hidden sm:block'}`}>
+            <h2 className="text-lg font-bold mb-3 text-center">Plastique en BB</h2>
             <div className="min-w-[600px] lg:min-w-0">
               <table className="w-full text-sm">
                 <thead>
-                  <tr>
-                    <th className="border px-2 py-1">Numéro</th>
-                    <th className="border px-2 py-1">Matière</th>
+                  <tr> 
+                  <th className="border px-2 py-1">Matière</th>
                     <th className="border px-2 py-1">BB</th>
                     <th className="border px-2 py-1">Palette</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {['PET broyé', 'Rouleau emballage', 'Bouchons'].map((matiere, index) => (
+                  {['PET broyé', 'Rouleau emballage', 'Bouchons', 'CD', 'Big bag'].map((matiere, index) => (
                     <tr key={matiere}>
+                    <td className="border px-2 py-1">{matiere}</td>
                       <td className="border px-2 py-1">
-                        <input
-                          type="number"
-                          className="w-full p-1"
-                          value={halleData[index].numero}
-                          onChange={(e) => handleHalleChange(index, 'numero', e.target.value)}
-                        />
-                      </td>
-                      <td className="border px-2 py-1">{matiere}</td>
-                      <td className="border px-2 py-1">
-                        <input
+                      <input
                           type="number"
                           className="w-full p-1"
                           value={halleData[index].bb}
@@ -183,13 +176,12 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
           </div>
 
           {/* Section INVENTAIRE */}
-          <div className={`border rounded-lg p-4 overflow-x-auto ${activeTab !== 'cdt' && 'hidden sm:block'}`}>
+          <div className={`border rounded-lg p-4 overflow-x-auto ${activeTab !== 'inventaire' && 'hidden sm:block'}`}>
             <h2 className="text-lg font-bold mb-4 text-center">CDT</h2>
             <div className="min-w-[600px] lg:min-w-0">
               <table className="w-full text-sm">
                 <thead>
                   <tr>
-                    <th className="border px-2 py-1">Numéro</th>
                     <th className="border px-2 py-1">Matière</th>
                     <th className="border px-2 py-1">m³</th>
                     <th className="border px-2 py-1">Tonnes</th>
@@ -205,9 +197,6 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
                     'Déchets'
                   ].map((matiere) => (
                     <tr key={matiere}>
-                      <td className="border px-2 py-1">
-                        <input type="number" className="w-full p-1" />
-                      </td>
                       <td className="border px-2 py-1">{matiere}</td>
                       <td className="border px-2 py-1">
                         <input type="number" className="w-full p-1" defaultValue="0" />
@@ -223,7 +212,7 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
           </div>
 
           {/* Section Plastique en balle */}
-          <div className={`border rounded-lg p-4 overflow-x-auto ${activeTab !== 'papierballes' && 'hidden sm:block'}`}>
+          <div className={`border rounded-lg p-4 overflow-x-auto ${activeTab !== 'plastique' && 'hidden sm:block'}`}>
             <h2 className="text-lg font-bold mb-4 text-center">Papier en balle</h2>
             <div className="min-w-[600px] lg:min-w-0">
               <table className="w-full text-sm">
