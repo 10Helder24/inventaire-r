@@ -105,7 +105,7 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
               activeTab === 'halle' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
             }`}
           >
-            Plastique (BB ou PAL)
+            Plastique en BB ou PAL
           </button>
           <button
             onClick={() => setActiveTab('inventaire')}
@@ -113,7 +113,7 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
               activeTab === 'inventaire' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
             }`}
           >
-            Inventaire
+            Plastique en balles
           </button>
           <button
             onClick={() => setActiveTab('plastique')}
@@ -121,7 +121,7 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
               activeTab === 'plastique' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
             }`}
           >
-            Plastique en balle
+            Papier en balles
           </button>
           <button
             onClick={() => setActiveTab('autres')}
@@ -136,7 +136,7 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Section INVENTAIRE DE LA HALLE */}
           <div className={`border rounded-lg p-4 overflow-x-auto ${activeTab !== 'halle' && 'hidden sm:block'}`}>
-            <h2 className="text-lg font-bold mb-4 text-center">Plastique BB ou PAL</h2>
+            <h2 className="text-lg font-bold mb-4 text-center">INVENTAIRE DE LA HALLE</h2>
             <div className="min-w-[600px] lg:min-w-0">
               <table className="w-full text-sm">
                 <thead>
@@ -184,7 +184,7 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
 
           {/* Section INVENTAIRE */}
           <div className={`border rounded-lg p-4 overflow-x-auto ${activeTab !== 'inventaire' && 'hidden sm:block'}`}>
-            <h2 className="text-lg font-bold mb-4 text-center">INVENTAIRE</h2>
+            <h2 className="text-lg font-bold mb-4 text-center">CDT</h2>
             <div className="min-w-[600px] lg:min-w-0">
               <table className="w-full text-sm">
                 <thead>
@@ -224,7 +224,7 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
 
           {/* Section Plastique en balle */}
           <div className={`border rounded-lg p-4 overflow-x-auto ${activeTab !== 'plastique' && 'hidden sm:block'}`}>
-            <h2 className="text-lg font-bold mb-4 text-center">Plastique en balle</h2>
+            <h2 className="text-lg font-bold mb-4 text-center">Papier en balle</h2>
             <div className="min-w-[600px] lg:min-w-0">
               <table className="w-full text-sm">
                 <thead>
