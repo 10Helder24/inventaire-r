@@ -118,7 +118,7 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
           <button
             onClick={() => setActiveTab('cdt')}
             className={`px-4 py-2 whitespace-nowrap ${
-              activeTab === 'plastique' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
+              activeTab === 'cdt' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
             }`}
           >
             Papier en balles
