@@ -105,10 +105,10 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
               activeTab === 'halle' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
             }`}
           >
-            Inventaire Halle
+            Plastique (BB ou PAL)
           </button>
           <button
-            onClick={() => setActiveTab('inventaire')}
+            onClick={() => setActiveTab('Plastique bb')}
             className={`px-4 py-2 whitespace-nowrap ${
               activeTab === 'inventaire' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
             }`}
@@ -136,7 +136,7 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Section INVENTAIRE DE LA HALLE */}
           <div className={`border rounded-lg p-4 overflow-x-auto ${activeTab !== 'halle' && 'hidden sm:block'}`}>
-            <h2 className="text-lg font-bold mb-4 text-center">INVENTAIRE DE LA HALLE</h2>
+            <h2 className="text-lg font-bold mb-4 text-center">Plastique BB ou PAL</h2>
             <div className="min-w-[600px] lg:min-w-0">
               <table className="w-full text-sm">
                 <thead>
