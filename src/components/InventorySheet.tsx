@@ -184,7 +184,7 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
           </div>
 
           {/* Section INVENTAIRE PLastique en balles*/}
-          <div className={`border rounded-lg p-4 overflow-x-auto ${activeTab !== 'cdt' && 'hidden sm:block'}`}>
+          <div className={`border rounded-lg p-4 overflow-x-auto ${activeTab !== 'plastiqueb' && 'hidden sm:block'}`}>
             <h2 className="text-lg font-bold mb-4 text-center">CDT</h2>
             <div className="min-w-[600px] lg:min-w-0">
               <table className="w-full text-sm">
