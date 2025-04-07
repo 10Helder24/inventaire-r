@@ -408,7 +408,7 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
 
         {/* Section INVENTAIRE OUTILS & MACHINES*/}
           <div className={`border rounded-lg p-4 overflow-x-auto ${activeTab !== 'machine' && 'hidden sm:block'}`}>
-            <h2 className="text-lg font-bold mb-4 text-center">CDT</h2>
+            <h2 className="text-lg font-bold mb-4 text-center">OUTILS DE MANUTENTION</h2>
             <div className="min-w-[600px] lg:min-w-0">
               <table className="w-full text-sm">
                 <thead>
@@ -448,7 +448,7 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
                     'Linde New H25',
                     'Broyeur Satrindtech',
                     'Linde L12 Atelier'
-                  ].map((matiere) => (
+                   ].map((matiere) => (
                     <tr key={matiere}>
                       <td className="border px-2 py-1">
                         <input type="number" className="w-full p-1" />
