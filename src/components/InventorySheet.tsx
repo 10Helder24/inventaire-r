@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Package, LogOut, ArrowLeft, Search, FolderOpen, Upload, Trash2, X, Plus, Save } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
@@ -54,6 +54,7 @@ interface InventoryData {
 export function InventorySheet({ articles, user, signOut }: InventorySheetProps) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('plastiquebb');
+  const [loading, setLoading] = useState(true);
   const [inventoryData, setInventoryData] = useState<InventoryData>({
     plastiqueBB: [
       { matiere: 'PET broyé', bb: 0, palette: 0 },
@@ -140,6 +141,39 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
       { numero: '2.0.37', machine: 'Linde L12 Atelier', balle: 0, heure: 0 }
     ]
   });
+
+  useEffect(() => {
+    const loadLatestInventory = async () => {
+      try {
+        setLoading(true);
+        const currentDate = new Date();
+        const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).toISOString();
+        const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).toISOString();
+
+        const { data, error } = await supabase
+          .from('inventory_sheets')
+          .select('*')
+          .eq('created_by', user.email)
+          .gte('date', startOfMonth)
+          .lte('date', endOfMonth)
+          .order('created_at', { ascending: false })
+          .limit(1);
+
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          setInventoryData(data[0].data);
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement de l\'inventaire:', error);
+        toast.error('Erreur lors du chargement de l\'inventaire');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadLatestInventory();
+  }, [user.email]);
 
   const handleSignOut = async () => {
     try {
@@ -303,478 +337,478 @@ export function InventorySheet({ articles, user, signOut }: InventorySheetProps)
       </header>
 
       <main className="container mx-auto px-4 pt-24 pb-6">
-        {/* Navigation des onglets */}
-        <div className="flex overflow-x-auto mb-4 -mx-4 px-4 border-b border-gray-200">
-          <button
-            onClick={() => setActiveTab('plastiquebb')}
-            className={`px-4 py-2 whitespace-nowrap ${
-              activeTab === 'plastiquebb' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
-            }`}
-          >
-            Plastique en BB
-          </button>
-          <button
-            onClick={() => setActiveTab('plastiqueballe')}
-            className={`px-4 py-2 whitespace-nowrap ${
-              activeTab === 'plastiqueballe' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
-            }`}
-          >
-            Plastique en balles
-          </button>
-          <button
-            onClick={() => setActiveTab('cdt')}
-            className={`px-4 py-2 whitespace-nowrap ${
-              activeTab === 'cdt' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
-            }`}
-          >
-            CDT
-          </button>
-          <button
-            onClick={() => setActiveTab('papierballe')}
-            className={`px-4 py-2 whitespace-nowrap ${
-              activeTab === 'papierballe' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
-            }`}
-          >
-            Papier en balles
-          </button>
-          <button
-            onClick={() => setActiveTab('autres')}
-            className={`px-4 py-2 whitespace-nowrap ${
-              activeTab === 'autres' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
-            }`}
-          >
-            Autres
-          </button>
-          <button
-            onClick={() => setActiveTab('machines')}
-            className={`px-4 py-2 whitespace-nowrap ${
-              activeTab === 'machines' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-600'
-            }`}
-          >
-            Machines
-          </button>
+        <div className="sticky top-[4.5rem] bg-white z-40 -mx-4 px-4 border-b border-gray-200">
+          <div className="flex overflow-x-auto gap-2 py-2">
+            <button
+              onClick={() => setActiveTab('plastiquebb')}
+              className={`px-4 py-2 whitespace-nowrap rounded-md transition-colors ${
+                activeTab === 'plastiquebb' 
+                  ? 'bg-green-600 text-white' 
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              Plastique en BB
+            </button>
+            <button
+              onClick={() => setActiveTab('plastiqueballe')}
+              className={`px-4 py-2 whitespace-nowrap rounded-md transition-colors ${
+                activeTab === 'plastiqueballe'
+                  ? 'bg-green-600 text-white'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              Plastique en balles
+            </button>
+            <button
+              onClick={() => setActiveTab('cdt')}
+              className={`px-4 py-2 whitespace-nowrap rounded-md transition-colors ${
+                activeTab === 'cdt'
+                  ? 'bg-green-600 text-white'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              CDT
+            </button>
+            <button
+              onClick={() => setActiveTab('papierballe')}
+              className={`px-4 py-2 whitespace-nowrap rounded-md transition-colors ${
+                activeTab === 'papierballe'
+                  ? 'bg-green-600 text-white'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              Papier en balles
+            </button>
+            <button
+              onClick={() => setActiveTab('autres')}
+              className={`px-4 py-2 whitespace-nowrap rounded-md transition-colors ${
+                activeTab === 'autres'
+                  ? 'bg-green-600 text-white'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              Autres
+            </button>
+            <button
+              onClick={() => setActiveTab('machines')}
+              className={`px-4 py-2 whitespace-nowrap rounded-md transition-colors ${
+                activeTab === 'machines'
+                  ? 'bg-green-600 text-white'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              Machines
+            </button>
+          </div>
         </div>
 
-        {/* Contenu des onglets */}
-        <div className="bg-white rounded-lg shadow-md p-4">
-          {/* Plastique BB */}
-          {activeTab === 'plastiquebb' && (
-            <div>
-              <h2 className="text-lg font-bold mb-4">Plastique en BB</h2>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr>
-                      <th className="border px-4 py-2">Matière</th>
-                      <th className="border px-4 py-2">BB</th>
-                      <th className="border px-4 py-2">Palette</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {inventoryData.plastiqueBB.map((item, index) => (
-                      <tr key={index}>
-                        <td className="border px-4 py-2">{item.matiere}</td>
-                        <td className="border px-4 py-2">
-                          <input
-                            type="number"
-                            value={item.bb}
-                            onChange={(e) => updateInventoryData('plastiqueBB', index, 'bb', e.target.value)}
-                            className="w-full p-1"
-                          />
-                        </td>
-                        <td className="border px-4 py-2">
-                          <input
-                            type="number"
-                            value={item.palette}
-                            onChange={(e) => updateInventoryData('plastiqueBB', index, 'palette', e.target.value)}
-                            className="w-full p-1"
-                          />
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {/* Plastique en balles */}
-          {activeTab === 'plastiqueballe' && (
-            <div>
-              <h2 className="text-lg font-bold mb-4">Plastique en balles</h2>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr>
-                      <th className="border px-4 py-2">Matière</th>
-                      <th className="border px-4 py-2">Balles</th>
-                      <th className="border px-4 py-2">Palette</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {inventoryData.plastiqueBalle.map((item, index) => (
-                      <tr key={index}>
-                        <td className="border px-4 py-2">{item.matiere}</td>
-                        <td className="border px-4 py-2">
-                          <input
-                            type="number"
-                            value={item.balle}
-                            onChange={(e) => updateInventoryData('plastiqueBalle', index, 'balle', e.target.value)}
-                            className="w-full p-1"
-                          />
-                        </td>
-                        <td className="border px-4 py-2">
-                          <input
-                            type="number"
-                            value={item.palette}
-                            onChange={(e) => updateInventoryData('plastiqueBalle', index, 'palette', e.target.value)}
-                            className="w-full p-1"
-                          />
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {/* CDT */}
-          {activeTab === 'cdt' && (
-            <div>
-              <h2 className="text-lg font-bold mb-4">CDT</h2>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr>
-                      <th className="border px-4 py-2">Matière</th>
-                      <th className="border px-4 py-2">m³</th>
-                      <th className="border px-4 py-2">Tonnes</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {inventoryData.cdt.map((item, index) => (
-                      <tr key={index}>
-                        <td className="border px-4 py-2">{item.matiere}</td>
-                        <td className="border px-4 py-2">
-                          <input
-                            type="number"
-                            value={item.m3}
-                            onChange={(e) => updateInventoryData('cdt', index, 'm3', e.target.value)}
-                            className="w-full p-1"
-                          />
-                        </td>
-                        <td className="border px-4 py-2">
-                          <input
-                            type="number"
-                            value={item.tonne}
-                            onChange={(e) => updateInventoryData('cdt', index, 'tonne', e.target.value)}
-                            className="w-full p-1"
-                          />
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {/* Papier en balles */}
-          {activeTab === 'papierballe' && (
-            <div>
-              <h2 className="text-lg font-bold mb-4">Papier en balles</h2>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr>
-                      <th className="border px-4 py-2">Numéro</th>
-                      <th className="border px-4 py-2">Matière</th>
-                      <th className="border px-4 py-2">Balles</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {inventoryData.papierBalle.map((item, index) => (
-                      <tr key={index}>
-                        <td className="border px-4 py-2">{item.numero}</td>
-                        <td className="border px-4 py-2">{item.matiere}</td>
-                        <td className="border px-4 py-2">
-                          <input
-                            type="number"
-                            value={item.balle}
-                            onChange={(e) => updateInventoryData('papierBalle', index, 'balle', e.target.value)}
-                            className="w-full p-1"
-                          />
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {/* Autres */}
-          {activeTab === 'autres' && (
-            <div>
-              <h2 className="text-lg font-bold mb-4">Autres</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {loading ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="text-gray-500">Chargement...</div>
+          </div>
+        ) : (
+          <div className="mt-4 bg-white rounded-lg shadow-md p-4">
+            {/* Plastique BB */}
+            {activeTab === 'plastiquebb' && (
+              <div>
+                <h2 className="text-lg font-bold mb-4">Plastique en BB</h2>
                 <div className="overflow-x-auto">
-                  <h3 className="text-md font-semibold mb-2">Stock</h3>
                   <table className="w-full">
                     <thead>
                       <tr>
-                        <th className="border px-4 py-2">Type</th>
-                        <th className="border px-4 py-2">Litres</th>
-                        <th className="border px-4 py-2">Pièces</th>
+                        <th className="border px-4 py-2">Matière</th>
+                        <th className="border px-4 py-2">BB</th>
+                        <th className="border px-4 py-2">Palette</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td className="border px-4 py-2">Diesel</td>
-                        <td className="border px-4 py-2">
-                          <input
-                            type="number"
-                            value={inventoryData.autres.diesel.litres}
-                            onChange={(e) => {
-                              const newData = { ...inventoryData };
-                              newData.autres.diesel.litres = Number(e.target.value);
-                              setInventoryData(newData);
-                            }}
-                            className="w-full p-1"
-                          />
-                        </td>
-                        <td className="border px-4 py-2">
-                          <input
-                            type="number"
-                            value={inventoryData.autres.diesel.piece}
-                            onChange={(e) => {
-                              const newData = { ...inventoryData };
-                              newData.autres.diesel.piece = Number(e.target.value);
-                              setInventoryData(newData);
-                            }}
-                            className="w-full p-1"
-                          />
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="border px-4 py-2">AD Blue</td>
-                        <td className="border px-4 py-2">
-                          <input
-                            type="number"
-                            value={inventoryData.autres.adBlue.litres}
-                            onChange={(e) => {
-                              const newData = { ...inventoryData };
-                              newData.autres.adBlue.litres = Number(e.target.value);
-                              setInventoryData(newData);
-                            }}
-                            className="w-full p-1"
-                          />
-                        </td>
-                        <td className="border px-4 py-2">
-                          <input
-                            type="number"
-                            value={inventoryData.autres.adBlue.piece}
-                            onChange={(e) => {
-                              const newData = { ...inventoryData };
-                              newData.autres.adBlue.piece = Number(e.target.value);
-                              setInventoryData(newData);
-                            }}
-                            className="w-full p-1"
-                          />
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="border px-4 py-2">Fil de fer</td>
-                        <td className="border px-4 py-2">
-                          <input
-                            type="number"
-                            value={inventoryData.autres.filFer.litres}
-                            onChange={(e) => {
-                              const newData = { ...inventoryData };
-                              newData.autres.filFer.litres = Number(e.target.value);
-                              setInventoryData(newData);
-                            }}
-                            className="w-full p-1"
-                          />
-                        </td>
-                        <td className="border px-4 py-2">
-                          <input
-                            type="number"
-                            value={inventoryData.autres.filFer.piece}
-                            onChange={(e) => {
-                              const newData = { ...inventoryData };
-                              newData.autres.filFer.piece = Number(e.target.value);
-                              setInventoryData(newData);
-                            }}
-                            className="w-full p-1"
-                          />
-                        </td>
-                      </tr>
+                      {inventoryData.plastiqueBB.map((item, index) => (
+                        <tr key={index}>
+                          <td className="border px-4 py-2">{item.matiere}</td>
+                          <td className="border px-4 py-2">
+                            <input
+                              type="number"
+                              value={item.bb}
+                              onChange={(e) => updateInventoryData('plastiqueBB', index, 'bb', e.target.value)}
+                              className="w-full p-1"
+                            />
+                          </td>
+                          <td className="border px-4 py-2">
+                            <input
+                              type="number"
+                              value={item.palette}
+                              onChange={(e) => updateInventoryData('plastiqueBB', index, 'palette', e.target.value)}
+                              className="w-full p-1"
+                            />
+                          </td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
+              </div>
+            )}
 
+            {/* Plastique en balles */}
+            {activeTab === 'plastiqueballe' && (
+              <div>
+                <h2 className="text-lg font-bold mb-4">Plastique en balles</h2>
                 <div className="overflow-x-auto">
-                  <h3 className="text-md font-semibold mb-2">Eau (Compteurs)</h3>
                   <table className="w-full">
                     <thead>
                       <tr>
-                        <th className="border px-4 py-2">Compteur</th>
+                        <th className="border px-4 py-2">Matière</th>
+                        <th className="border px-4 py-2">Balles</th>
+                        <th className="border px-4 py-2">Palette</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {inventoryData.plastiqueBalle.map((item, index) => (
+                        <tr key={index}>
+                          <td className="border px-4 py-2">{item.matiere}</td>
+                          <td className="border px-4 py-2">
+                            <input
+                              type="number"
+                              value={item.balle}
+                              onChange={(e) => updateInventoryData('plastiqueBalle', index, 'balle', e.target.value)}
+                              className="w-full p-1"
+                            />
+                          </td>
+                          <td className="border px-4 py-2">
+                            <input
+                              type="number"
+                              value={item.palette}
+                              onChange={(e) => updateInventoryData('plastiqueBalle', index, 'palette', e.target.value)}
+                              className="w-full p-1"
+                            />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* CDT */}
+            {activeTab === 'cdt' && (
+              <div>
+                <h2 className="text-lg font-bold mb-4">CDT</h2>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr>
+                        <th className="border px-4 py-2">Matière</th>
                         <th className="border px-4 py-2">m³</th>
-                        <th className="border px-4 py-2">Valeur</th>
+                        <th className="border px-4 py-2">Tonnes</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td className="border px-4 py-2">Morgevon 11</td>
-                        <td className="border px-4 py-2">
-                          <input
-                            type="number"
-                            value={inventoryData.eau.morgevon11.m3}
-                            onChange={(e) => {
-                              const newData = { ...inventoryData };
-                              newData.eau.morgevon11.m3 = Number(e.target.value);
-                              setInventoryData(newData);
-                            }}
-                            className="w-full p-1"
-                          />
-                        </td>
-                        <td className="border px-4 py-2">
-                          <input
-                            type="number"
-                            value={inventoryData.eau.morgevon11.compteur}
-                            onChange={(e) => {
-                              const newData = { ...inventoryData };
-                              newData.eau.morgevon11.compteur = Number(e.target.value);
-                              setInventoryData(newData);
-                            }}
-                            className="w-full p-1"
-                          />
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="border px-4 py-2">Morgevon 13</td>
-                        <td className="border px-4 py-2">
-                          <input
-                            type="number"
-                            value={inventoryData.eau.morgevon13.m3}
-                            onChange={(e) => {
-                              const newData = { ...inventoryData };
-                              newData.eau.morgevon13.m3 = Number(e.target.value);
-                              setInventoryData(newData);
-                            }}
-                            className="w-full p-1"
-                          />
-                        </td>
-                        <td className="border px-4 py-2">
-                          <input
-                            type="number"
-                            value={inventoryData.eau.morgevon13.compteur}
-                            onChange={(e) => {
-                              const newData = { ...inventoryData };
-                              newData.eau.morgevon13.compteur = Number(e.target.value);
-                              setInventoryData(newData);
-                            }}
-                            className="w-full p-1"
-                          />
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="border px-4 py-2">Halle à bois</td>
-                        <td className="border px-4 py-2">
-                          <input
-                            type="number"
-                            value={inventoryData.eau.halleBois.m3}
-                            onChange={(e) => {
-                              const newData = { ...inventoryData };
-                              newData.eau.halleBois.m3 = Number(e.target.value);
-                              setInventoryData(newData);
-                            }}
-                            className="w-full p-1"
-                          />
-                        </td>
-                        <td className="border px-4 py-2">
-                          <input
-                            type="number"
-                            value={inventoryData.eau.halleBois.compteur}
-                            onChange={(e) => {
-                              const newData = { ...inventoryData };
-                              newData.eau.halleBois.compteur = Number(e.target.value);
-                              setInventoryData(newData);
-                            }}
-                            className="w-full p-1"
-                          />
-                        </td>
-                      </tr>
+                      {inventoryData.cdt.map((item, index) => (
+                        <tr key={index}>
+                          <td className="border px-4 py-2">{item.matiere}</td>
+                          <td className="border px-4 py-2">
+                            <input
+                              type="number"
+                              value={item.m3}
+                              onChange={(e) => updateInventoryData('cdt', index, 'm3', e.target.value)}
+                              className="w-full p-1"
+                            />
+                          </td>
+                          <td className="border px-4 py-2">
+                            <input
+                              type="number"
+                              value={item.tonne}
+                              onChange={(e) => updateInventoryData('cdt', index, 'tonne', e.target.value)}
+                              className="w-full p-1"
+                            />
+                          </td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Machines */}
-          {activeTab === 'machines' && (
-            <div>
-              <h2 className="text-lg font-bold mb-4">Machines</h2>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr>
-                      <th className="border px-4 py-2">Numéro</th>
-                      <th className="border px-4 py-2">Machine</th>
-                      <th className="border px-4 py-2">Balles</th>
-                      <th className="border px-4 py-2">Heures</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {inventoryData.machines.map((item, index) => (
-                      <tr key={index}>
-                        <td className="border px-4 py-2">{item.numero}</td>
-                        <td className="border px-4 py-2">{item.machine}</td>
-                        <td className="border px-4 py-2">
-                          <input
-                            type="number"
-                            value={item.balle}
-                            onChange={(e) => updateInventoryData('machines', index, 'balle', e.target.value)}
-                            className="w-full p-1"
-                          />
-                        </td>
-                        <td className="border px-4 py-2">
-                          <input
-                            type="number"
-                            value={item.heure}
-                            onChange={(e) => updateInventoryData('machines', index, 'heure', e.target.value)}
-                            className="w-full p-1"
-                          />
-                        </td>
+            {/* Papier en balles */}
+            {activeTab === 'papierballe' && (
+              <div>
+                <h2 className="text-lg font-bold mb-4">Papier en balles</h2>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr>
+                        <th className="border px-4 py-2">Numéro</th>
+                        <th className="border px-4 py-2">Matière</th>
+                        <th className="border px-4 py-2">Balles</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {inventoryData.papierBalle.map((item, index) => (
+                        <tr key={index}>
+                          <td className="border px-4 py-2">{item.numero}</td>
+                          <td className="border px-4 py-2">{item.matiere}</td>
+                          <td className="border px-4 py-2">
+                            <input
+                              type="number"
+                              value={item.balle}
+                              onChange={(e) => updateInventoryData('papierBalle', index, 'balle', e.target.value)}
+                              className="w-full p-1"
+                            />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
 
-        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div>
-            <p className="font-bold mb-2">Établi par:</p>
-            <p>{user.email}</p>
-          </div>
-          <div>
-            <p className="font-bold mb-2">Vérifié par:</p>
-            <p>Nom: _________________</p>
-            <p>Signature: _________________</p>
-          </div>
-        </div>
+            {/* Autres */}
+            {activeTab === 'autres' && (
+              <div>
+                <h2 className="text-lg font-bold mb-4">Autres</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="overflow-x-auto">
+                    <h3 className="text-md font-semibold mb-2">Stock</h3>
+                    <table className="w-full">
+                      <thead>
+                        <tr>
+                          <th className="border px-4 py-2">Type</th>
+                          <th className="border px-4 py-2">Litres</th>
+                          <th className="border px-4 py-2">Pièces</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td className="border px-4 py-2">Diesel</td>
+                          <td className="border px-4 py-2">
+                            <input
+                              type="number"
+                              value={inventoryData.autres.diesel.litres}
+                              onChange={(e) => {
+                                const newData = { ...inventoryData };
+                                newData.autres.diesel.litres = Number(e.target.value);
+                                setInventoryData(newData);
+                              }}
+                              className="w-full p-1"
+                            />
+                          </td>
+                          <td className="border px-4 py-2">
+                            <input
+                
+                              type="number"
+                              value={inventoryData.autres.diesel.piece}
+                              onChange={(e) => {
+                                const newData = { ...inventoryData };
+                                newData.autres.diesel.piece = Number(e.target.value);
+                                setInventoryData(newData);
+                              }}
+                              className="w-full p-1"
+                            />
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="border px-4 py-2">AD Blue</td>
+                          <td className="border px-4 py-2">
+                            <input
+                              type="number"
+                              value={inventoryData.autres.adBlue.litres}
+                              onChange={(e) => {
+                                const newData = { ...inventoryData };
+                                newData.autres.adBlue.litres = Number(e.target.value);
+                                setInventoryData(newData);
+                              }}
+                              className="w-full p-1"
+                            />
+                          </td>
+                          <td className="border px-4 py-2">
+                            <input
+                              type="number"
+                              value={inventoryData.autres.adBlue.piece}
+                              onChange={(e) => {
+                                const newData = { ...inventoryData };
+                                newData.autres.adBlue.piece = Number(e.target.value);
+                                setInventoryData(newData);
+                              }}
+                              className="w-full p-1"
+                            />
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="border px-4 py-2">Fil de fer</td>
+                          <td className="border px-4 py-2">
+                            <input
+                              type="number"
+                              value={inventoryData.autres.filFer.litres}
+                              onChange={(e) => {
+                                const newData = { ...inventoryData };
+                                newData.autres.filFer.litres = Number(e.target.value);
+                                setInventoryData(newData);
+                              }}
+                              className="w-full p-1"
+                            />
+                          </td>
+                          <td className="border px-4 py-2">
+                            <input
+                              type="number"
+                              value={inventoryData.autres.filFer.piece}
+                              onChange={(e) => {
+                                const newData = { ...inventoryData };
+                                newData.autres.filFer.piece = Number(e.target.value);
+                                setInventoryData(newData);
+                              }}
+                              className="w-full p-1"
+                            />
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <h3 className="text-md font-semibold mb-2">Eau</h3>
+                    <table className="w-full">
+                      <thead>
+                        <tr>
+                          <th className="border px-4 py-2">Compteur</th>
+                          <th className="border px-4 py-2">m³</th>
+                          <th className="border px-4 py-2">Valeur</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td className="border px-4 py-2">Morgevon 11</td>
+                          <td className="border px-4 py-2">
+                            <input
+                              type="number"
+                              value={inventoryData.eau.morgevon11.m3}
+                              onChange={(e) => {
+                                const newData = { ...inventoryData };
+                                newData.eau.morgevon11.m3 = Number(e.target.value);
+                                setInventoryData(newData);
+                              }}
+                              className="w-full p-1"
+                            />
+                          </td>
+                          <td className="border px-4 py-2">
+                            <input
+                              type="number"
+                              value={inventoryData.eau.morgevon11.compteur}
+                              onChange={(e) => {
+                                const newData = { ...inventoryData };
+                                newData.eau.morgevon11.compteur = Number(e.target.value);
+                                setInventoryData(newData);
+                              }}
+                              className="w-full p-1"
+                            />
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="border px-4 py-2">Morgevon 13</td>
+                          <td className="border px-4 py-2">
+                            <input
+                              type="number"
+                              value={inventoryData.eau.morgevon13.m3}
+                              onChange={(e) => {
+                                const newData = { ...inventoryData };
+                                newData.eau.morgevon13.m3 = Number(e.target.value);
+                                setInventoryData(newData);
+                              }}
+                              className="w-full p-1"
+                            />
+                          </td>
+                          <td className="border px-4 py-2">
+                            <input
+                              type="number"
+                              value={inventoryData.eau.morgevon13.compteur}
+                              onChange={(e) => {
+                                const newData = { ...inventoryData };
+                                newData.eau.morgevon13.compteur = Number(e.target.value);
+                                setInventoryData(newData);
+                              }}
+                              className="w-full p-1"
+                            />
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="border px-4 py-2">Halle à bois</td>
+                          <td className="border px-4 py-2">
+                            <input
+                              type="number"
+                              value={inventoryData.eau.halleBois.m3}
+                              onChange={(e) => {
+                                const newData = { ...inventoryData };
+                                newData.eau.halleBois.m3 = Number(e.target.value);
+                                setInventoryData(newData);
+                              }}
+                              className="w-full p-1"
+                            />
+                          </td>
+                          <td className="border px-4 py-2">
+                            <input
+                              type="number"
+                              value={inventoryData.eau.halleBois.compteur}
+                              onChange={(e) => {
+                                const newData = { ...inventoryData };
+                                newData.eau.halleBois.compteur = Number(e.target.value);
+                                setInventoryData(newData);
+                              }}
+                              className="w-full p-1"
+                            />
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
 
-        <div className="text-center mt-4">
-          <p className="font-bold">
-            INVENTAIRE DU MOIS DE: {new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
-          </p>
-        </div>
+            {/* Machines */}
+            {activeTab === 'machines' && (
+              <div>
+                <h2 className="text-lg font-bold mb-4">Machines</h2>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr>
+                        <th className="border px-4 py-2">Numéro</th>
+                        <th className="border px-4 py-2">Machine</th>
+                        <th className="border px-4 py-2">Balles</th>
+                        <th className="border px-4 py-2">Heures</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {inventoryData.machines.map((item, index) => (
+                        <tr key={index}>
+                          <td className="border px-4 py-2">{item.numero}</td>
+                          <td className="border px-4 py-2">{item.machine}</td>
+                          <td className="border px-4 py-2">
+                            <input
+                              type="number"
+                              value={item.balle}
+                              onChange={(e) => updateInventoryData('machines', index, 'balle', e.target.value)}
+                              className="w-full p-1"
+                            />
+                          </td>
+                          <td className="border px-4 py-2">
+                            <input
+                              type="number"
+                              value={item.heure}
+                              onChange={(e) => updateInventoryData('machines', index, 'heure', e.target.value)}
+                              className="w-full p-1"
+                            />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </main>
     </div>
   );
