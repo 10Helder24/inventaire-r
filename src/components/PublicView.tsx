@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Package, LogIn, Search, Filter } from 'lucide-react';
+import { Package, LogIn, Search, Filter, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { Article } from '../types';
 
@@ -44,13 +44,29 @@ export function PublicView({ articles, loading }: PublicViewProps) {
                 <Package className="h-6 w-6" />
                 <h1 className="text-xl font-bold">Inventaire</h1>
               </div>
-              <button
-                onClick={() => navigate('/login')}
-                className="flex items-center gap-2 px-4 py-2 bg-green-700 hover:bg-green-800 rounded-md transition-colors"
-              >
-                <LogIn className="h-5 w-5" />
-                <span className="hidden sm:inline">Connexion</span>
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => navigate('/vacation-calendar')}
+                  className="flex items-center gap-2 px-4 py-2 bg-green-700 hover:bg-green-800 rounded-md transition-colors"
+                >
+                  <Calendar className="h-5 w-5" />
+                  <span className="hidden sm:inline">Calendrier des congés</span>
+                </button>
+                <button
+                  onClick={() => navigate('/vacation-request')}
+                  className="flex items-center gap-2 px-4 py-2 bg-green-700 hover:bg-green-800 rounded-md transition-colors"
+                >
+                  <Calendar className="h-5 w-5" />
+                  <span className="hidden sm:inline">Demander un congé</span>
+                </button>
+                <button
+                  onClick={() => navigate('/login')}
+                  className="flex items-center gap-2 px-4 py-2 bg-green-700 hover:bg-green-800 rounded-md transition-colors"
+                >
+                  <LogIn className="h-5 w-5" />
+                  <span className="hidden sm:inline">Connexion</span>
+                </button>
+              </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="relative flex-1">
