@@ -1,13 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
+import type { Database } from './types';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://jpjluqaoljddqnmhaqqc.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impwamx1cWFvbGpkZHFubWhhcXFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4ODAzODQsImV4cCI6MjA1ODQ1NjM4NH0.IkqaBiT7CW3hLCf0Gm3Uu6i6cLuYQv5E4v7acpE8vpI';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
@@ -17,3 +18,18 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     storageKey: 'supabase.auth.token',
   },
 });
+
+// Fonction utilitaire pour récupérer les articles
+export async function fetchArticles() {
+  const { data, error } = await supabase
+    .from('articles')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Erreur lors de la récupération des articles:', error);
+    throw error;
+  }
+
+  return data || [];
+}
