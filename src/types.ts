@@ -21,3 +21,71 @@ export interface User {
   email: string;
   role: 'admin' | 'viewer';
 }
+
+export interface InventorySheet {
+  id: string;
+  date: string;
+  data: {
+    halle: {
+      bb: number;
+      palette: number;
+    }[];
+    plastiqueBB: {
+      matiere: string;
+      bb: number;
+      palette: number;
+    }[];
+    plastiqueBalle: {
+      matiere: string;
+      balle: number;
+      palette: number;
+    }[];
+    cdt: {
+      matiere: string;
+      m3: number;
+      tonne: number;
+    }[];
+    papierBalle: {
+      numero: string;
+      matiere: string;
+      balle: number;
+    }[];
+    autres: {
+      diesel: { litres: number; piece: number };
+      adBlue: { litres: number; piece: number };
+      filFer: { litres: number; piece: number };
+    };
+    eau: {
+      morgevon11: { m3: number; compteur: number };
+      morgevon13: { m3: number; compteur: number };
+      halleBois: { m3: number; compteur: number };
+    };
+    machines: {
+      numero: string;
+      machine: string;
+      balle: number;
+      heure: number;
+    }[];
+  };
+  created_by: string;
+  verified_by?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type Database = {
+  public: {
+    Tables: {
+      articles: {
+        Row: Article;
+        Insert: Omit<Article, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<Article, 'id' | 'created_at' | 'updated_at'>>;
+      };
+      inventory_sheets: {
+        Row: InventorySheet;
+        Insert: Omit<InventorySheet, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<InventorySheet, 'id' | 'created_at' | 'updated_at'>>;
+      };
+    };
+  };
+};
