@@ -22,7 +22,6 @@ export function InventoryManager({ articles, user, signOut, onArticleUpdate }: I
   const imageUrl = watch('image_url');
   const navigate = useNavigate();
 
-  // Extract unique categories from articles
   const categories = ['all', ...new Set(articles.map(article => article.category))].filter(Boolean);
 
   const filteredArticles = articles.filter(article => {
@@ -65,11 +64,7 @@ export function InventoryManager({ articles, user, signOut, onArticleUpdate }: I
 
       const { error: uploadError } = await supabase.storage
         .from('articles')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false,
-          contentType: file.type
-        });
+        .upload(filePath, file);
 
       if (uploadError) throw uploadError;
 
@@ -108,7 +103,6 @@ export function InventoryManager({ articles, user, signOut, onArticleUpdate }: I
       };
 
       if (selectedArticle) {
-        // Update
         const { error } = await supabase
           .from('articles')
           .update(article)
@@ -117,7 +111,6 @@ export function InventoryManager({ articles, user, signOut, onArticleUpdate }: I
         if (error) throw error;
         toast.success('Article mis à jour avec succès');
       } else {
-        // Insert
         const { error } = await supabase
           .from('articles')
           .insert([article]);
@@ -174,46 +167,51 @@ export function InventoryManager({ articles, user, signOut, onArticleUpdate }: I
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-green-600 text-white shadow-lg">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Package className="h-6 w-6" />
-            <h1 className="text-xl font-bold">Gestion de l'inventaire</h1>
-          </div>
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => navigate('/sheet')}
-              className="flex items-center gap-2 px-4 py-2 bg-green-700 hover:bg-green-800 rounded-md transition-colors"
-            >
-              <FileSpreadsheet className="h-5 w-5" />
-              Feuille d'inventaire
-            </button>
-            <button
-              onClick={() => navigate('/list')}
-              className="flex items-center gap-2 px-4 py-2 bg-green-700 hover:bg-green-800 rounded-md transition-colors"
-            >
-              <List className="h-5 w-5" />
-              Vue liste
-            </button>
-            <div className="flex items-center gap-1 text-sm">
-              <div className="w-2 h-2 bg-green-300 rounded-full"></div>
-              <span>Vous travaillez en ligne</span>
+      <header className="bg-green-600 text-white shadow-lg fixed top-0 left-0 right-0 z-50">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Package className="h-6 w-6" />
+                <h1 className="text-xl font-bold">Gestion de l'inventaire</h1>
+              </div>
             </div>
-            <div className="flex items-center gap-4">
-              <span className="text-sm">{user.email}</span>
+            <div className="flex flex-wrap items-center gap-2 ml-auto">
               <button
-                onClick={handleSignOut}
-                className="p-2 hover:bg-green-700 rounded-full transition-colors"
+                onClick={() => navigate('/sheet')}
+                className="flex items-center gap-2 px-4 py-2 bg-green-700 hover:bg-green-800 rounded-md transition-colors"
               >
-                <LogOut className="h-5 w-5" />
+                <FileSpreadsheet className="h-5 w-5" />
+                <span className="hidden sm:inline">Feuille d'inventaire</span>
               </button>
+              <button
+                onClick={() => navigate('/list')}
+                className="flex items-center gap-2 px-4 py-2 bg-green-700 hover:bg-green-800 rounded-md transition-colors"
+              >
+                <List className="h-5 w-5" />
+                <span className="hidden sm:inline">Vue liste</span>
+              </button>
+              <div className="hidden sm:flex items-center gap-1 text-sm">
+                <div className="w-2 h-2 bg-green-300 rounded-full"></div>
+                <span>En ligne</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm hidden sm:inline">{user.email}</span>
+                <button
+                  onClick={handleSignOut}
+                  className="p-2 hover:bg-green-700 rounded-full transition-colors"
+                  title="Déconnexion"
+                >
+                  <LogOut className="h-5 w-5" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto p-6 flex gap-6">
-        <aside className="w-80 bg-white rounded-lg shadow-md overflow-hidden">
+      <main className="container mx-auto px-4 pt-20 pb-6 flex flex-col lg:flex-row gap-6">
+        <aside className="w-full lg:w-80 bg-white rounded-lg shadow-md overflow-hidden">
           <div className="p-4 border-b">
             <div className="relative mb-4">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
@@ -241,7 +239,7 @@ export function InventoryManager({ articles, user, signOut, onArticleUpdate }: I
               </select>
             </div>
           </div>
-          <div className="divide-y divide-gray-100 max-h-[calc(100vh-12rem)] overflow-y-auto">
+          <div className="divide-y divide-gray-100 max-h-[calc(100vh-16rem)] overflow-y-auto">
             {filteredArticles.map((article) => (
               <div
                 key={article.id}
@@ -267,13 +265,13 @@ export function InventoryManager({ articles, user, signOut, onArticleUpdate }: I
           </div>
         </aside>
 
-        <section className="flex-1 bg-white rounded-lg shadow-md p-6">
+        <section className="flex-1 bg-white rounded-lg shadow-md p-4 sm:p-6">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="flex justify-between items-center pb-4 border-b">
               <h2 className="text-xl font-bold text-gray-900">
                 {selectedArticle ? 'Modifier l\'article' : 'Nouvel article'}
               </h2>
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-2">
                 {selectedArticle && (
                   <button
                     type="button"
@@ -281,7 +279,7 @@ export function InventoryManager({ articles, user, signOut, onArticleUpdate }: I
                     className="flex items-center gap-2 px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-md transition-colors"
                   >
                     <Trash2 className="h-5 w-5" />
-                    Supprimer
+                    <span className="hidden sm:inline">Supprimer</span>
                   </button>
                 )}
                 <button
@@ -295,12 +293,12 @@ export function InventoryManager({ articles, user, signOut, onArticleUpdate }: I
                   {selectedArticle ? (
                     <>
                       <X className="h-5 w-5" />
-                      Annuler
+                      <span className="hidden sm:inline">Annuler</span>
                     </>
                   ) : (
                     <>
                       <Plus className="h-5 w-5" />
-                      Nouveau
+                      <span className="hidden sm:inline">Nouveau</span>
                     </>
                   )}
                 </button>
@@ -309,13 +307,15 @@ export function InventoryManager({ articles, user, signOut, onArticleUpdate }: I
                   className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors"
                 >
                   <Save className="h-5 w-5" />
-                  {selectedArticle ? 'Mettre à jour' : 'Enregistrer'}
+                  <span className="hidden sm:inline">
+                    {selectedArticle ? 'Mettre à jour' : 'Enregistrer'}
+                  </span>
                 </button>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-6">
-              <div className="col-span-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="col-span-full">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Image
                 </label>
@@ -345,7 +345,7 @@ export function InventoryManager({ articles, user, signOut, onArticleUpdate }: I
                 />
               </div>
 
-              <div>
+              <div className="col-span-full sm:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Catégorie
                 </label>
@@ -356,7 +356,7 @@ export function InventoryManager({ articles, user, signOut, onArticleUpdate }: I
                 />
               </div>
 
-              <div>
+              <div className="col-span-full sm:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Référence
                 </label>
@@ -366,7 +366,7 @@ export function InventoryManager({ articles, user, signOut, onArticleUpdate }: I
                 />
               </div>
 
-              <div>
+              <div className="col-span-full sm:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Nom
                 </label>
@@ -376,7 +376,7 @@ export function InventoryManager({ articles, user, signOut, onArticleUpdate }: I
                 />
               </div>
 
-              <div>
+              <div className="col-span-full sm:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Stock
                 </label>
@@ -387,7 +387,7 @@ export function InventoryManager({ articles, user, signOut, onArticleUpdate }: I
                 />
               </div>
 
-              <div>
+              <div className="col-span-full sm:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Unité
                 </label>
@@ -397,7 +397,7 @@ export function InventoryManager({ articles, user, signOut, onArticleUpdate }: I
                 />
               </div>
 
-              <div>
+              <div className="col-span-full sm:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Emplacement
                 </label>
@@ -407,7 +407,7 @@ export function InventoryManager({ articles, user, signOut, onArticleUpdate }: I
                 />
               </div>
 
-              <div>
+              <div className="col-span-full sm:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Code-barres
                 </label>
@@ -416,21 +416,19 @@ export function InventoryManager({ articles, user, signOut, onArticleUpdate }: I
                   className="w-full focus:ring-2 focus:ring-green-500 focus:border-green-500"
                 />
               </div>
-            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Commentaire
-              </label>
-              <textarea
-                {...register('comments')}
-                rows={3}
-                className="w-full focus:ring-2 focus:ring-green-500 focus:border-green-500"
-              />
-            </div>
+              <div className="col-span-full">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Commentaire
+                </label>
+                <textarea
+                  {...register('comments')}
+                  rows={3}
+                  className="w-full focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                />
+              </div>
 
-            <div className="grid grid-cols-2 gap-6">
-              <div>
+              <div className="col-span-full sm:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Désignation 2
                 </label>
@@ -440,7 +438,7 @@ export function InventoryManager({ articles, user, signOut, onArticleUpdate }: I
                 />
               </div>
 
-              <div>
+              <div className="col-span-full sm:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Désignation 3
                 </label>
