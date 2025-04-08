@@ -8,12 +8,16 @@ import { PublicView } from './components/PublicView';
 import { InventoryManager } from './components/InventoryManager';
 import { InventoryList } from './components/InventoryList';
 import { InventorySheet } from './components/InventorySheet';
+import { VacationCalendar } from './components/VacationCalendar';
+import { VacationRequest } from './components/VacationRequest';
+import { VacationAdmin } from './components/VacationAdmin';
 import type { Article } from './types';
 
 function App() {
   const { user, signOut } = useAuth();
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
+  const isAdmin = user?.user_metadata?.role === 'admin' || user?.app_metadata?.role === 'admin';
 
   const loadArticles = async () => {
     try {
@@ -35,9 +39,22 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<PublicView articles={articles} loading={loading} />} />
+        <Route path="/login" element={user ? <Navigate to="/manage" replace /> : <LoginForm />} />
+        <Route path="/vacation-calendar" element={<VacationCalendar user={user} signOut={signOut} />} />
+        <Route path="/vacation-request" element={<VacationRequest user={user} signOut={signOut} />} />
         <Route
-          path="/login"
-          element={user ? <Navigate to="/manage" replace /> : <LoginForm />}
+          path="/vacation-admin"
+          element={
+            user ? (
+              isAdmin ? (
+                <VacationAdmin user={user} signOut={signOut} />
+              ) : (
+                <Navigate to="/vacation-calendar" replace />
+              )
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
         />
         <Route
           path="/manage"
@@ -88,4 +105,4 @@ function App() {
   );
 }
 
-export default App
+export default App;
