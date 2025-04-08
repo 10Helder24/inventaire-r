@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, Session } from '@supabase/supabase-js';
+import { User } from '@supabase/supabase-js';
 import { supabase } from '../supabaseClient';
 import { toast } from 'react-hot-toast';
 
@@ -18,24 +18,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkSession = async () => {
+    // Déconnexion automatique au chargement de l'application
+    const init = async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-
-        if (error) {
-          console.error('Erreur récupération session:', error);
-          return;
-        }
-
-        setUser(session?.user ?? null);
+        await supabase.auth.signOut();
+        setUser(null);
       } catch (error) {
-        console.error('Erreur vérification session:', error);
+        console.error('Erreur lors de la déconnexion initiale:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    checkSession();
+    init();
 
     const {
       data: { subscription },
@@ -80,14 +75,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        console.warn('Aucune session active trouvée');
-        setUser(null);
-        return;
-      }
-
       const { error } = await supabase.auth.signOut();
       
       if (error) throw error;
@@ -97,8 +84,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error: any) {
       console.error('Erreur de déconnexion:', error.message);
       toast.error('Erreur de déconnexion: ' + error.message);
-      
-      // Force reset user state even if logout fails
       setUser(null);
     }
   };
