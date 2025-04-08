@@ -19,7 +19,7 @@ export interface Article {
 export interface User {
   id: string;
   email: string;
-  role: 'admin' | 'viewer';
+  role: 'admin' | 'user';
 }
 
 export interface InventorySheet {
@@ -73,6 +73,23 @@ export interface InventorySheet {
   updated_at: string;
 }
 
+export type AbsenceType = 'vacation' | 'sick_leave' | 'training' | 'overtime' | 'bereavement' | 'accident';
+export type RequestStatus = 'pending' | 'approved' | 'rejected';
+
+export interface VacationRequest {
+  id: string;
+  user_email: string;
+  start_date: string;
+  end_date: string;
+  type: AbsenceType;
+  status: RequestStatus;
+  comment?: string;
+  created_at: string;
+  updated_at: string;
+  approved_by?: string;
+  approved_at?: string;
+}
+
 export type Database = {
   public: {
     Tables: {
@@ -85,6 +102,11 @@ export type Database = {
         Row: InventorySheet;
         Insert: Omit<InventorySheet, 'id' | 'created_at' | 'updated_at'>;
         Update: Partial<Omit<InventorySheet, 'id' | 'created_at' | 'updated_at'>>;
+      };
+      vacation_requests: {
+        Row: VacationRequest;
+        Insert: Omit<VacationRequest, 'id' | 'created_at' | 'updated_at' | 'status' | 'approved_by' | 'approved_at'>;
+        Update: Partial<Omit<VacationRequest, 'id' | 'created_at' | 'updated_at'>>;
       };
     };
   };
