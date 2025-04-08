@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Package, Search, Plus, Save, LogOut, Upload, Trash2, X, FolderOpen, List, FileSpreadsheet } from 'lucide-react';
+import { Package, Search, Plus, Save, LogOut, Upload, Trash2, X, FolderOpen, List, FileSpreadsheet, Calendar } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
@@ -21,6 +21,7 @@ export function InventoryManager({ articles, user, signOut, onArticleUpdate }: I
   const { register, handleSubmit, reset, setValue, watch } = useForm();
   const imageUrl = watch('image_url');
   const navigate = useNavigate();
+  const isAdmin = user?.user_metadata?.role === 'admin' || user?.app_metadata?.role === 'admin';
 
   const categories = ['all', ...new Set(articles.map(article => article.category))].filter(Boolean);
 
@@ -191,6 +192,23 @@ export function InventoryManager({ articles, user, signOut, onArticleUpdate }: I
                 <List className="h-5 w-5" />
                 <span className="hidden sm:inline">Vue liste</span>
               </button>
+              {isAdmin ? (
+                <button
+                  onClick={() => navigate('/vacation-admin')}
+                  className="flex items-center gap-2 px-4 py-2 bg-green-700 hover:bg-green-800 rounded-md transition-colors"
+                >
+                  <Calendar className="h-5 w-5" />
+                  <span className="hidden sm:inline">Gérer les congés</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => navigate('/vacation-request')}
+                  className="flex items-center gap-2 px-4 py-2 bg-green-700 hover:bg-green-800 rounded-md transition-colors"
+                >
+                  <Calendar className="h-5 w-5" />
+                  <span className="hidden sm:inline">Demander un congé</span>
+                </button>
+              )}
               <div className="hidden sm:flex items-center gap-1 text-sm">
                 <div className="w-2 h-2 bg-green-300 rounded-full"></div>
                 <span>En ligne</span>
