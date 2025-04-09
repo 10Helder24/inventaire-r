@@ -10,6 +10,17 @@ export default defineConfig({
   build: {
     commonjsOptions: {
       transformMixedEsModules: true
+    },
+    rollupOptions: {
+      external: [
+        /@react-pdf\/renderer\/.*/,
+        'react-pdf',
+        '@react-pdf/font',
+        '@react-pdf/layout',
+        '@react-pdf/pdfkit',
+        '@react-pdf/image',
+        '@react-pdf/textkit'
+      ]
     }
   }
 });
