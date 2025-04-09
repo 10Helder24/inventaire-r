@@ -15,22 +15,20 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const initAuth = async () => {
+    const checkSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         setUser(session?.user ?? null);
       } catch (error) {
-        console.error('Error initializing auth:', error);
+        console.error('Erreur lors de la vérification de la session:', error);
         setUser(null);
-      } finally {
-        setLoading(false);
       }
     };
 
-    initAuth();
+    checkSession();
 
     const {
       data: { subscription },
@@ -43,6 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
+      setLoading(true);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -56,11 +55,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error('Erreur de connexion:', error.message);
       toast.error('Erreur de connexion: ' + error.message);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
   const signInWithOtp = async (email: string) => {
     try {
+      setLoading(true);
       const { error } = await supabase.auth.signInWithOtp({ email });
 
       if (error) throw error;
@@ -70,31 +72,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error('Erreur OTP:', error.message);
       toast.error('Erreur OTP: ' + error.message);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
   const signOut = async () => {
     try {
+      setLoading(true);
       const { error } = await supabase.auth.signOut();
       
       if (error) throw error;
       
       setUser(null);
+      window.localStorage.removeItem('supabase.auth.token');
       toast.success('Déconnexion réussie');
     } catch (error: any) {
       console.error('Erreur de déconnexion:', error.message);
       toast.error('Erreur de déconnexion: ' + error.message);
       setUser(null);
+    } finally {
+      setLoading(false);
     }
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-gray-500">Chargement...</div>
-      </div>
-    );
-  }
 
   return (
     <AuthContext.Provider value={{ user, loading, signIn, signInWithOtp, signOut }}>
