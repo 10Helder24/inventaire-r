@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Package, LogOut, Calendar, ChevronLeft, ChevronRight, Home } from 'lucide-react';
+import { Package, LogOut, Calendar, ChevronLeft, ChevronRight, Home, Menu } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { supabase } from '../supabaseClient';
@@ -40,6 +40,7 @@ export function VacationCalendar({ user, signOut }: VacationCalendarProps) {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [vacationRequests, setVacationRequests] = useState<VacationRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const isAdmin = user?.user_metadata?.role === 'admin' || user?.app_metadata?.role === 'admin';
 
   useEffect(() => {
@@ -137,57 +138,65 @@ export function VacationCalendar({ user, signOut }: VacationCalendarProps) {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-green-600 text-white shadow-lg fixed top-0 left-0 right-0 z-50">
         <div className="container mx-auto px-4 py-3">
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Calendar className="h-6 w-6" />
-              <h1 className="text-xl font-bold">Suivi des absences mensuel</h1>
+              <h1 className="text-xl font-bold">Suivi des absences</h1>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
               <button
-                onClick={() => navigate('/')}
-                className="flex items-center gap-2 px-4 py-2 bg-green-700 hover:bg-green-800 rounded-md transition-colors"
+                onClick={() => setShowMobileMenu(!showMobileMenu)}
+                className="md:hidden p-2 hover:bg-green-700 rounded-md"
               >
-                <Home className="h-5 w-5" />
-                <span className="hidden sm:inline">Accueil</span>
+                <Menu className="h-6 w-6" />
               </button>
-              {user ? (
-                <>
-                  <button
-                    onClick={() => navigate('/vacation-request')}
-                    className="flex items-center gap-2 px-4 py-2 bg-green-700 hover:bg-green-800 rounded-md transition-colors"
-                  >
-                    <span>Demander un congé</span>
-                  </button>
-                  {isAdmin && (
+              <div className={`${showMobileMenu ? 'absolute top-full left-0 right-0 bg-green-600 shadow-lg p-4' : 'hidden'} md:flex md:static md:bg-transparent md:shadow-none md:p-0 flex-col md:flex-row items-start md:items-center gap-2`}>
+                <button
+                  onClick={() => navigate('/')}
+                  className="flex items-center gap-2 px-4 py-2 hover:bg-green-700 rounded-md w-full md:w-auto"
+                >
+                  <Home className="h-5 w-5" />
+                  <span>Accueil</span>
+                </button>
+                {user ? (
+                  <>
                     <button
-                      onClick={() => navigate('/vacation-admin')}
-                      className="flex items-center gap-2 px-4 py-2 bg-green-700 hover:bg-green-800 rounded-md transition-colors"
+                      onClick={() => navigate('/vacation-request')}
+                      className="flex items-center gap-2 px-4 py-2 hover:bg-green-700 rounded-md w-full md:w-auto"
                     >
-                      <span>Gérer les demandes</span>
+                      <Calendar className="h-5 w-5" />
+                      <span>Demander un congé</span>
                     </button>
-                  )}
-                  <div className="hidden sm:flex items-center gap-1 text-sm">
-                    <div className="w-2 h-2 bg-green-300 rounded-full"></div>
-                    <span>En ligne</span>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <span className="text-sm hidden sm:inline">{user.email}</span>
+                    {isAdmin && (
+                      <button
+                        onClick={() => navigate('/vacation-admin')}
+                        className="flex items-center gap-2 px-4 py-2 hover:bg-green-700 rounded-md w-full md:w-auto"
+                      >
+                        <Calendar className="h-5 w-5" />
+                        <span>Gérer les demandes</span>
+                      </button>
+                    )}
+                    <div className="hidden md:flex items-center gap-1 text-sm">
+                      <div className="w-2 h-2 bg-green-300 rounded-full"></div>
+                      <span>{user.email}</span>
+                    </div>
                     <button
                       onClick={handleSignOut}
-                      className="p-2 hover:bg-green-700 rounded-full transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 hover:bg-green-700 rounded-md w-full md:w-auto"
                     >
                       <LogOut className="h-5 w-5" />
+                      <span>Déconnexion</span>
                     </button>
-                  </div>
-                </>
-              ) : (
-                <button
-                  onClick={() => navigate('/login')}
-                  className="flex items-center gap-2 px-4 py-2 bg-green-700 hover:bg-green-800 rounded-md transition-colors"
-                >
-                  <span>Se connecter</span>
-                </button>
-              )}
+                  </>
+                ) : (
+                  <button
+                    onClick={() => navigate('/login')}
+                    className="flex items-center gap-2 px-4 py-2 hover:bg-green-700 rounded-md w-full md:w-auto"
+                  >
+                    <span>Se connecter</span>
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -195,8 +204,8 @@ export function VacationCalendar({ user, signOut }: VacationCalendarProps) {
 
       <main className="container mx-auto px-4 pt-24 pb-6">
         <div className="bg-white rounded-lg shadow-md p-4">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <div className="flex items-center gap-2">
               <button
                 onClick={handlePreviousMonth}
                 className="p-2 hover:bg-gray-100 rounded-full"
@@ -231,7 +240,7 @@ export function VacationCalendar({ user, signOut }: VacationCalendarProps) {
               </button>
             </div>
 
-            <div className="flex flex-wrap gap-4">
+            <div className="grid grid-cols-2 md:flex flex-wrap gap-2 md:gap-4">
               {Object.entries(TYPE_LABELS).map(([type, label]) => (
                 <div key={type} className="flex items-center gap-2">
                   <div className={`w-4 h-4 rounded ${TYPE_COLORS[type as AbsenceType]}`}></div>
@@ -246,45 +255,47 @@ export function VacationCalendar({ user, signOut }: VacationCalendarProps) {
               <div className="text-gray-500">Chargement...</div>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr>
-                    <th className="border px-2 py-1 bg-gray-50 text-left">Nom</th>
-                    {DAYS_IN_MONTH.map(day => (
-                      <th key={day} className="border px-2 py-1 bg-gray-50 text-center w-7">
-                        {day}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {employeesForMonth.map(name => (
-                    <tr key={name}>
-                      <td className="border px-2 py-1">{name}</td>
-                      {DAYS_IN_MONTH.map(day => {
-                        const absence = getAbsenceForDay(name, day);
-                        const cellClass = absence
-                          ? absence.status === 'rejected'
-                            ? 'bg-red-100'
-                            : absence.status === 'approved'
-                            ? TYPE_COLORS[absence.type]
-                            : 'bg-gray-100'
-                          : '';
-                        return (
-                          <td
-                            key={day}
-                            className={`border px-2 py-1 text-center ${cellClass}`}
-                            title={absence ? `${TYPE_LABELS[absence.type]} (${absence.status})` : ''}
-                          >
-                            {absence ? '•' : ''}
-                          </td>
-                        );
-                      })}
+            <div className="overflow-x-auto -mx-4 md:mx-0">
+              <div className="inline-block min-w-full align-middle">
+                <table className="min-w-full text-sm">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="sticky left-0 z-10 bg-gray-50 border px-2 py-1 text-left">Nom</th>
+                      {DAYS_IN_MONTH.map(day => (
+                        <th key={day} className="border px-2 py-1 text-center w-7">
+                          {day}
+                        </th>
+                      ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="bg-white">
+                    {employeesForMonth.map(name => (
+                      <tr key={name}>
+                        <td className="sticky left-0 z-10 bg-white border px-2 py-1 font-medium">
+                          {name}
+                        </td>
+                        {DAYS_IN_MONTH.map(day => {
+                          const absence = getAbsenceForDay(name, day);
+                          const cellClass = absence
+                            ? absence.status === 'rejected'
+                              ? 'bg-red-100'
+                              : TYPE_COLORS[absence.type]
+                            : '';
+                          return (
+                            <td
+                              key={day}
+                              className={`border px-2 py-1 text-center ${cellClass}`}
+                              title={absence ? `${TYPE_LABELS[absence.type]} (${absence.status})` : ''}
+                            >
+                              {absence ? '•' : ''}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>
