@@ -10,7 +10,6 @@ interface VacationCalendarProps {
   signOut: () => Promise<void>;
 }
 
-const DAYS_IN_MONTH = Array.from({ length: 31 }, (_, i) => i + 1);
 const MONTHS = [
   'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
   'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
@@ -34,6 +33,31 @@ const TYPE_LABELS: Record<AbsenceType, string> = {
   accident: 'Accident'
 };
 
+// Fonction pour normaliser les noms
+function normalizeName(name: string): { firstName: string; lastName: string } {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    // Si le nom contient au moins deux parties, on considère la dernière comme le nom de famille
+    const lastName = parts.pop() || '';
+    const firstName = parts.join(' ');
+    return { firstName, lastName };
+  }
+  return { firstName: '', lastName: name };
+}
+
+// Fonction de comparaison pour le tri
+function compareNames(a: string, b: string): number {
+  const nameA = normalizeName(a);
+  const nameB = normalizeName(b);
+  
+  // D'abord comparer les noms de famille
+  const lastNameCompare = nameA.lastName.localeCompare(nameB.lastName, 'fr');
+  if (lastNameCompare !== 0) return lastNameCompare;
+  
+  // Si les noms de famille sont identiques, comparer les prénoms
+  return nameA.firstName.localeCompare(nameB.firstName, 'fr');
+}
+
 export function VacationCalendar({ user, signOut }: VacationCalendarProps) {
   const navigate = useNavigate();
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -48,33 +72,32 @@ export function VacationCalendar({ user, signOut }: VacationCalendarProps) {
       try {
         setLoading(true);
         
-        // Get first and last day of selected month
-        const startDate = new Date(selectedYear, selectedMonth, 1);
-        const endDate = new Date(selectedYear, selectedMonth + 1, 0);
-        
-        // Format dates for Postgres
-        const startStr = startDate.toISOString().split('T')[0];
-        const endStr = endDate.toISOString().split('T')[0];
-
-        // Fetch requests that overlap with the selected month
+        // Get all approved requests
         const { data: requests, error } = await supabase
           .from('vacation_requests')
           .select('*')
-          .eq('status', 'approved')
-          .or(`start_date.lte.${endStr},end_date.gte.${startStr}`);
+          .eq('status', 'approved');
 
         if (error) throw error;
 
-        // Filter requests to only include those that overlap with the selected month
-        const filteredRequests = requests?.filter(request => {
+        // Filter requests that overlap with the selected month
+        const filteredRequests = (requests || []).filter(request => {
           const requestStart = new Date(request.start_date);
           const requestEnd = new Date(request.end_date);
+          const monthStart = new Date(selectedYear, selectedMonth, 1);
+          const monthEnd = new Date(selectedYear, selectedMonth + 1, 0);
+
+          // Set times to ensure proper comparison
+          monthStart.setHours(0, 0, 0, 0);
+          monthEnd.setHours(23, 59, 59, 999);
+          requestStart.setHours(0, 0, 0, 0);
+          requestEnd.setHours(23, 59, 59, 999);
+
           return (
-            (requestStart.getFullYear() === selectedYear && requestStart.getMonth() === selectedMonth) ||
-            (requestEnd.getFullYear() === selectedYear && requestEnd.getMonth() === selectedMonth) ||
-            (requestStart <= startDate && requestEnd >= endDate)
+            (requestStart <= monthEnd && requestEnd >= monthStart) ||
+            (requestEnd >= monthStart && requestStart <= monthEnd)
           );
-        }) || [];
+        });
 
         setVacationRequests(filteredRequests);
       } catch (error) {
@@ -116,23 +139,31 @@ export function VacationCalendar({ user, signOut }: VacationCalendarProps) {
   };
 
   const getAbsenceForDay = (name: string, day: number): { type: AbsenceType; status: string } | null => {
-    const date = new Date(selectedYear, selectedMonth, day);
+    const currentDate = new Date(selectedYear, selectedMonth, day);
+    currentDate.setHours(0, 0, 0, 0);
+    
     const request = vacationRequests.find(r => {
-      const start = new Date(r.start_date);
-      const end = new Date(r.end_date);
-      return (
-        r.name === name && 
-        date >= new Date(start.setHours(0, 0, 0, 0)) && 
-        date <= new Date(end.setHours(23, 59, 59, 999))
-      );
+      if (r.name !== name) return false;
+      
+      const startDate = new Date(r.start_date);
+      const endDate = new Date(r.end_date);
+      
+      startDate.setHours(0, 0, 0, 0);
+      endDate.setHours(23, 59, 59, 999);
+      
+      return currentDate >= startDate && currentDate <= endDate;
     });
+
     return request ? { type: request.type, status: request.status } : null;
   };
 
-  // Get unique employees who have vacations in the current month
+  // Get unique employees who have vacations in the current month and sort them properly
   const employeesForMonth = Array.from(
     new Set(vacationRequests.map(r => r.name))
-  ).sort();
+  ).sort(compareNames);
+
+  const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
+  const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -261,7 +292,7 @@ export function VacationCalendar({ user, signOut }: VacationCalendarProps) {
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="sticky left-0 z-10 bg-gray-50 border px-2 py-1 text-left">Nom</th>
-                      {DAYS_IN_MONTH.map(day => (
+                      {daysArray.map(day => (
                         <th key={day} className="border px-2 py-1 text-center w-7">
                           {day}
                         </th>
@@ -274,20 +305,15 @@ export function VacationCalendar({ user, signOut }: VacationCalendarProps) {
                         <td className="sticky left-0 z-10 bg-white border px-2 py-1 font-medium">
                           {name}
                         </td>
-                        {DAYS_IN_MONTH.map(day => {
+                        {daysArray.map(day => {
                           const absence = getAbsenceForDay(name, day);
-                          const cellClass = absence
-                            ? absence.status === 'rejected'
-                              ? 'bg-red-100'
-                              : TYPE_COLORS[absence.type]
-                            : '';
                           return (
                             <td
                               key={day}
-                              className={`border px-2 py-1 text-center ${cellClass}`}
-                              title={absence ? `${TYPE_LABELS[absence.type]} (${absence.status})` : ''}
+                              className={`border px-2 py-1 text-center ${absence ? TYPE_COLORS[absence.type] : ''}`}
+                              title={absence ? `${TYPE_LABELS[absence.type]}` : ''}
                             >
-                              {absence ? '•' : ''}
+                              {absence && '•'}
                             </td>
                           );
                         })}
