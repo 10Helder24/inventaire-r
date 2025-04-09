@@ -14,10 +14,11 @@ export default defineConfig({
     rollupOptions: {
       external: [],
       output: {
-        manualChunks: {
-          'react-pdf': ['@react-pdf/renderer']
-        }
+        manualChunks: undefined
       }
     }
+  },
+  optimizeDeps: {
+    include: ['@react-pdf/renderer']
   }
 });
