@@ -18,19 +18,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Déconnexion automatique au chargement de l'application
-    const init = async () => {
+    const initAuth = async () => {
       try {
-        await supabase.auth.signOut();
-        setUser(null);
+        const { data: { session } } = await supabase.auth.getSession();
+        setUser(session?.user ?? null);
       } catch (error) {
-        console.error('Erreur lors de la déconnexion initiale:', error);
+        console.error('Error initializing auth:', error);
+        setUser(null);
       } finally {
         setLoading(false);
       }
     };
 
-    init();
+    initAuth();
 
     const {
       data: { subscription },
@@ -87,6 +87,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-gray-500">Chargement...</div>
+      </div>
+    );
+  }
 
   return (
     <AuthContext.Provider value={{ user, loading, signIn, signInWithOtp, signOut }}>
