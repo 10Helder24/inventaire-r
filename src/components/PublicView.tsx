@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Package, LogIn, Search, Filter, Calendar } from 'lucide-react';
+import { Package, LogIn, Search, Filter, Calendar, FileSpreadsheet } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { Article } from '../types';
 
@@ -45,6 +45,13 @@ export function PublicView({ articles, loading }: PublicViewProps) {
                 <h1 className="text-xl font-bold">Inventaire</h1>
               </div>
               <div className="flex items-center gap-2">
+                <button
+                  onClick={() => navigate('/sorting-sheet')}
+                  className="flex items-center gap-2 px-4 py-2 bg-green-700 hover:bg-green-800 rounded-md transition-colors"
+                >
+                  <FileSpreadsheet className="h-5 w-5" />
+                  <span className="hidden sm:inline">Centre de tri</span>
+                </button>
                 <button
                   onClick={() => navigate('/vacation-calendar')}
                   className="flex items-center gap-2 px-4 py-2 bg-green-700 hover:bg-green-800 rounded-md transition-colors"
