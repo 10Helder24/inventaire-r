@@ -34,17 +34,11 @@ const TYPE_LABELS: Record<AbsenceType, string> = {
   accident: 'Accident'
 };
 
-interface EmployeeInfo {
-  email: string;
-  name: string;
-}
-
 export function VacationCalendar({ user, signOut }: VacationCalendarProps) {
   const navigate = useNavigate();
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [vacationRequests, setVacationRequests] = useState<VacationRequest[]>([]);
-  const [employees, setEmployees] = useState<EmployeeInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const isAdmin = user?.user_metadata?.role === 'admin' || user?.app_metadata?.role === 'admin';
 
@@ -52,20 +46,36 @@ export function VacationCalendar({ user, signOut }: VacationCalendarProps) {
     const fetchData = async () => {
       try {
         setLoading(true);
-        // Create date range for the selected month
-        const startDate = new Date(Date.UTC(selectedYear, selectedMonth, 1));
-        const endDate = new Date(Date.UTC(selectedYear, selectedMonth + 1, 0));
+        
+        // Get first and last day of selected month
+        const startDate = new Date(selectedYear, selectedMonth, 1);
+        const endDate = new Date(selectedYear, selectedMonth + 1, 0);
+        
+        // Format dates for Postgres
+        const startStr = startDate.toISOString().split('T')[0];
+        const endStr = endDate.toISOString().split('T')[0];
 
-        const { data: requests, error: requestsError } = await supabase
+        // Fetch requests that overlap with the selected month
+        const { data: requests, error } = await supabase
           .from('vacation_requests')
           .select('*')
-          .or(`start_date.lte.${endDate.toISOString()},end_date.gte.${startDate.toISOString()}`);
+          .eq('status', 'approved')
+          .or(`start_date.lte.${endStr},end_date.gte.${startStr}`);
 
-        if (requestsError) throw requestsError;
+        if (error) throw error;
 
-        const uniqueEmployees = [...new Set(requests?.map(r => ({ email: r.user_email, name: r.name })) || [])];
-        setEmployees(uniqueEmployees.sort((a, b) => a.name.localeCompare(b.name)));
-        setVacationRequests(requests || []);
+        // Filter requests to only include those that overlap with the selected month
+        const filteredRequests = requests?.filter(request => {
+          const requestStart = new Date(request.start_date);
+          const requestEnd = new Date(request.end_date);
+          return (
+            (requestStart.getFullYear() === selectedYear && requestStart.getMonth() === selectedMonth) ||
+            (requestEnd.getFullYear() === selectedYear && requestEnd.getMonth() === selectedMonth) ||
+            (requestStart <= startDate && requestEnd >= endDate)
+          );
+        }) || [];
+
+        setVacationRequests(filteredRequests);
       } catch (error) {
         console.error('Error fetching data:', error);
         toast.error('Erreur lors du chargement des données');
@@ -104,23 +114,24 @@ export function VacationCalendar({ user, signOut }: VacationCalendarProps) {
     }
   };
 
-  const getAbsenceForDay = (email: string, day: number): { type: AbsenceType; status: string } | null => {
-    const currentDate = new Date(Date.UTC(selectedYear, selectedMonth, day));
-    
+  const getAbsenceForDay = (name: string, day: number): { type: AbsenceType; status: string } | null => {
+    const date = new Date(selectedYear, selectedMonth, day);
     const request = vacationRequests.find(r => {
-      const startDate = new Date(r.start_date);
-      const endDate = new Date(r.end_date);
-      
-      // Convert dates to UTC to avoid timezone issues
-      const startUTC = Date.UTC(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
-      const endUTC = Date.UTC(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
-      const currentUTC = Date.UTC(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
-      
-      return r.user_email === email && currentUTC >= startUTC && currentUTC <= endUTC;
+      const start = new Date(r.start_date);
+      const end = new Date(r.end_date);
+      return (
+        r.name === name && 
+        date >= new Date(start.setHours(0, 0, 0, 0)) && 
+        date <= new Date(end.setHours(23, 59, 59, 999))
+      );
     });
-
     return request ? { type: request.type, status: request.status } : null;
   };
+
+  // Get unique employees who have vacations in the current month
+  const employeesForMonth = Array.from(
+    new Set(vacationRequests.map(r => r.name))
+  ).sort();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -248,11 +259,11 @@ export function VacationCalendar({ user, signOut }: VacationCalendarProps) {
                   </tr>
                 </thead>
                 <tbody>
-                  {employees.map(employee => (
-                    <tr key={employee.email}>
-                      <td className="border px-2 py-1">{employee.name || employee.email.split('@')[0]}</td>
+                  {employeesForMonth.map(name => (
+                    <tr key={name}>
+                      <td className="border px-2 py-1">{name}</td>
                       {DAYS_IN_MONTH.map(day => {
-                        const absence = getAbsenceForDay(employee.email, day);
+                        const absence = getAbsenceForDay(name, day);
                         const cellClass = absence
                           ? absence.status === 'rejected'
                             ? 'bg-red-100'
