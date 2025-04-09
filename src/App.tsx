@@ -11,6 +11,7 @@ import { InventorySheet } from './components/InventorySheet';
 import { VacationCalendar } from './components/VacationCalendar';
 import { VacationRequest } from './components/VacationRequest';
 import { VacationAdmin } from './components/VacationAdmin';
+import { SortingSheet } from './components/SortingSheet';
 import type { Article } from './types';
 
 function App() {
@@ -50,6 +51,7 @@ function App() {
         <Route path="/login" element={user ? <Navigate to="/manage" replace /> : <LoginForm />} />
         <Route path="/vacation-calendar" element={<VacationCalendar user={user} signOut={signOut} />} />
         <Route path="/vacation-request" element={<VacationRequest user={user} signOut={signOut} />} />
+        <Route path="/sorting-sheet" element={<SortingSheet user={user} signOut={signOut} />} />
         <Route
           path="/vacation-admin"
           element={
