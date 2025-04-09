@@ -10,7 +10,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
-    persistSession: true,
+    persistSession: false, // Ne pas persister la session
     autoRefreshToken: true,
     detectSessionInUrl: true,
     flowType: 'pkce',
@@ -21,15 +21,20 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
 
 // Fonction utilitaire pour récupérer les articles
 export async function fetchArticles() {
-  const { data, error } = await supabase
-    .from('articles')
-    .select('*')
-    .order('created_at', { ascending: false });
+  try {
+    const { data, error } = await supabase
+      .from('articles')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-  if (error) {
+    if (error) {
+      console.error('Erreur lors de la récupération des articles:', error);
+      throw error;
+    }
+
+    return data || [];
+  } catch (error) {
     console.error('Erreur lors de la récupération des articles:', error);
-    throw error;
+    return [];
   }
-
-  return data || [];
 }
