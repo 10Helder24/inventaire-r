@@ -34,12 +34,17 @@ const TYPE_LABELS: Record<AbsenceType, string> = {
   accident: 'Accident'
 };
 
+interface EmployeeInfo {
+  email: string;
+  name: string;
+}
+
 export function VacationCalendar({ user, signOut }: VacationCalendarProps) {
   const navigate = useNavigate();
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [vacationRequests, setVacationRequests] = useState<VacationRequest[]>([]);
-  const [employees, setEmployees] = useState<string[]>([]);
+  const [employees, setEmployees] = useState<EmployeeInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const isAdmin = user?.user_metadata?.role === 'admin' || user?.app_metadata?.role === 'admin';
 
@@ -47,20 +52,19 @@ export function VacationCalendar({ user, signOut }: VacationCalendarProps) {
     const fetchData = async () => {
       try {
         setLoading(true);
-        // Set time to start of day for start date and end of day for end date
-        const startDate = new Date(Date.UTC(selectedYear, selectedMonth, 1, 0, 0, 0, 0));
-        const endDate = new Date(Date.UTC(selectedYear, selectedMonth + 1, 0, 23, 59, 59, 999));
+        // Create date range for the selected month
+        const startDate = new Date(Date.UTC(selectedYear, selectedMonth, 1));
+        const endDate = new Date(Date.UTC(selectedYear, selectedMonth + 1, 0));
 
         const { data: requests, error: requestsError } = await supabase
           .from('vacation_requests')
           .select('*')
-          .gte('start_date', startDate.toISOString())
-          .lte('end_date', endDate.toISOString());
+          .or(`start_date.lte.${endDate.toISOString()},end_date.gte.${startDate.toISOString()}`);
 
         if (requestsError) throw requestsError;
 
-        const uniqueEmployees = [...new Set(requests?.map(r => r.user_email) || [])];
-        setEmployees(uniqueEmployees.sort());
+        const uniqueEmployees = [...new Set(requests?.map(r => ({ email: r.user_email, name: r.name })) || [])];
+        setEmployees(uniqueEmployees.sort((a, b) => a.name.localeCompare(b.name)));
         setVacationRequests(requests || []);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -101,28 +105,18 @@ export function VacationCalendar({ user, signOut }: VacationCalendarProps) {
   };
 
   const getAbsenceForDay = (email: string, day: number): { type: AbsenceType; status: string } | null => {
-    // Create date for the current day being checked
-    const currentDate = new Date(Date.UTC(selectedYear, selectedMonth, day, 12, 0, 0, 0));
-
+    const currentDate = new Date(Date.UTC(selectedYear, selectedMonth, day));
+    
     const request = vacationRequests.find(r => {
-      // Parse dates and ensure they're in UTC
       const startDate = new Date(r.start_date);
-      const startUTC = new Date(Date.UTC(
-        startDate.getUTCFullYear(),
-        startDate.getUTCMonth(),
-        startDate.getUTCDate(),
-        0, 0, 0, 0
-      ));
-
       const endDate = new Date(r.end_date);
-      const endUTC = new Date(Date.UTC(
-        endDate.getUTCFullYear(),
-        endDate.getUTCMonth(),
-        endDate.getUTCDate(),
-        23, 59, 59, 999
-      ));
-
-      return r.user_email === email && currentDate >= startUTC && currentDate <= endUTC;
+      
+      // Convert dates to UTC to avoid timezone issues
+      const startUTC = Date.UTC(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+      const endUTC = Date.UTC(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+      const currentUTC = Date.UTC(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+      
+      return r.user_email === email && currentUTC >= startUTC && currentUTC <= endUTC;
     });
 
     return request ? { type: request.type, status: request.status } : null;
@@ -254,11 +248,11 @@ export function VacationCalendar({ user, signOut }: VacationCalendarProps) {
                   </tr>
                 </thead>
                 <tbody>
-                  {employees.map(email => (
-                    <tr key={email}>
-                      <td className="border px-2 py-1">{email.split('@')[0]}</td>
+                  {employees.map(employee => (
+                    <tr key={employee.email}>
+                      <td className="border px-2 py-1">{employee.name || employee.email.split('@')[0]}</td>
                       {DAYS_IN_MONTH.map(day => {
-                        const absence = getAbsenceForDay(email, day);
+                        const absence = getAbsenceForDay(employee.email, day);
                         const cellClass = absence
                           ? absence.status === 'rejected'
                             ? 'bg-red-100'
