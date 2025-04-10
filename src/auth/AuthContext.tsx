@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User } from '@supabase/supabase-js';
+import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '../supabaseClient';
 import { toast } from 'react-hot-toast';
 
 interface AuthContextType {
   user: User | null;
+  session: Session | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signInWithOtp: (email: string) => Promise<void>;
@@ -15,16 +16,19 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const checkSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
+        setSession(session);
         setUser(session?.user ?? null);
       } catch (error) {
         console.error('Erreur lors de la vérification de la session:', error);
         setUser(null);
+        setSession(null);
       }
     };
 
@@ -33,6 +37,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
       setUser(session?.user ?? null);
     });
 
@@ -50,6 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (error) throw error;
 
       setUser(data.user);
+      setSession(data.session);
       toast.success('Connexion réussie');
     } catch (error: any) {
       console.error('Erreur de connexion:', error.message);
@@ -85,19 +91,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (error) throw error;
       
       setUser(null);
+      setSession(null);
       window.localStorage.removeItem('supabase.auth.token');
       toast.success('Déconnexion réussie');
     } catch (error: any) {
       console.error('Erreur de déconnexion:', error.message);
       toast.error('Erreur de déconnexion: ' + error.message);
       setUser(null);
+      setSession(null);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signInWithOtp, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, signIn, signInWithOtp, signOut }}>
       {children}
     </AuthContext.Provider>
   );
