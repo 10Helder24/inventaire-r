@@ -32,6 +32,11 @@ interface VacationStats {
   accidentDays: number;
 }
 
+// Fonction pour normaliser un nom (enlever les espaces supplémentaires et mettre en minuscules)
+function normalizeName(name: string): string {
+  return name.trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
 export function VacationAdmin({ user, signOut }: VacationAdminProps) {
   const navigate = useNavigate();
   const [requests, setRequests] = useState<VacationRequest[]>([]);
@@ -70,11 +75,14 @@ export function VacationAdmin({ user, signOut }: VacationAdminProps) {
     fetchRequests();
   }, []);
 
-  // Get unique employees from approved requests
-  const employees = Array.from(new Set(requests
-    .filter(r => r.status === 'approved')
-    .map(r => r.name)))
-    .sort((a, b) => a.localeCompare(b));
+  // Get unique employees from approved requests with name normalization
+  const employees = Array.from(
+    new Map(
+      requests
+        .filter(r => r.status === 'approved')
+        .map(r => [normalizeName(r.name), r.name]) // Utiliser le nom normalisé comme clé
+    ).values() // Prendre les valeurs originales
+  ).sort((a, b) => a.localeCompare(b));
 
   // Calculate statistics when employee or year changes
   useEffect(() => {
@@ -92,7 +100,7 @@ export function VacationAdmin({ user, signOut }: VacationAdminProps) {
     }
 
     const employeeRequests = requests.filter(r => 
-      r.name === selectedEmployee && 
+      normalizeName(r.name) === normalizeName(selectedEmployee) && 
       r.status === 'approved' &&
       new Date(r.start_date).getFullYear() === selectedYear
     );
