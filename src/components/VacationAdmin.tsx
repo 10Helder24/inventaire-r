@@ -3,6 +3,7 @@ import { LogOut, Calendar, ArrowLeft, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { supabase } from '../supabaseClient';
+import { getWorkingDays } from '../utils/holidays';
 
 interface VacationAdminProps {
   user: any;
@@ -21,11 +22,32 @@ interface VacationRequest {
   created_at: string;
 }
 
+interface VacationStats {
+  totalDays: number;
+  vacationDays: number;
+  sickDays: number;
+  trainingDays: number;
+  overtimeDays: number;
+  bereavementDays: number;
+  accidentDays: number;
+}
+
 export function VacationAdmin({ user, signOut }: VacationAdminProps) {
   const navigate = useNavigate();
   const [requests, setRequests] = useState<VacationRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
+  const [selectedEmployee, setSelectedEmployee] = useState<string>('');
+  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+  const [stats, setStats] = useState<VacationStats>({
+    totalDays: 0,
+    vacationDays: 0,
+    sickDays: 0,
+    trainingDays: 0,
+    overtimeDays: 0,
+    bereavementDays: 0,
+    accidentDays: 0
+  });
 
   const fetchRequests = async () => {
     try {
@@ -47,6 +69,83 @@ export function VacationAdmin({ user, signOut }: VacationAdminProps) {
   useEffect(() => {
     fetchRequests();
   }, []);
+
+  // Get unique employees from approved requests
+  const employees = Array.from(new Set(requests
+    .filter(r => r.status === 'approved')
+    .map(r => r.name)))
+    .sort((a, b) => a.localeCompare(b));
+
+  // Calculate statistics when employee or year changes
+  useEffect(() => {
+    if (!selectedEmployee) {
+      setStats({
+        totalDays: 0,
+        vacationDays: 0,
+        sickDays: 0,
+        trainingDays: 0,
+        overtimeDays: 0,
+        bereavementDays: 0,
+        accidentDays: 0
+      });
+      return;
+    }
+
+    const employeeRequests = requests.filter(r => 
+      r.name === selectedEmployee && 
+      r.status === 'approved' &&
+      new Date(r.start_date).getFullYear() === selectedYear
+    );
+
+    const newStats = {
+      totalDays: 0,
+      vacationDays: 0,
+      sickDays: 0,
+      trainingDays: 0,
+      overtimeDays: 0,
+      bereavementDays: 0,
+      accidentDays: 0
+    };
+
+    employeeRequests.forEach(request => {
+      // Utiliser getWorkingDays pour exclure les weekends et jours fériés
+      const days = getWorkingDays(
+        new Date(request.start_date),
+        new Date(request.end_date)
+      );
+      
+      switch (request.type) {
+        case 'vacation':
+          newStats.vacationDays += days;
+          break;
+        case 'sick_leave':
+          newStats.sickDays += days;
+          break;
+        case 'training':
+          newStats.trainingDays += days;
+          break;
+        case 'overtime':
+          newStats.overtimeDays += days;
+          break;
+        case 'bereavement':
+          newStats.bereavementDays += days;
+          break;
+        case 'accident':
+          newStats.accidentDays += days;
+          break;
+      }
+    });
+
+    newStats.totalDays = 
+      newStats.vacationDays +
+      newStats.sickDays +
+      newStats.trainingDays +
+      newStats.overtimeDays +
+      newStats.bereavementDays +
+      newStats.accidentDays;
+
+    setStats(newStats);
+  }, [selectedEmployee, selectedYear, requests]);
 
   const handleSignOut = async () => {
     try {
@@ -164,6 +263,78 @@ export function VacationAdmin({ user, signOut }: VacationAdminProps) {
       </header>
 
       <main className="container mx-auto px-4 pt-24 pb-6">
+        {/* Statistics Section */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <h2 className="text-lg font-bold mb-4">Statistiques des congés</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Employé
+              </label>
+              <select
+                value={selectedEmployee}
+                onChange={(e) => setSelectedEmployee(e.target.value)}
+                className="w-full border rounded-md px-3 py-2"
+              >
+                <option value="">Sélectionner un employé</option>
+                {employees.map(employee => (
+                  <option key={employee} value={employee}>
+                    {employee}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Année
+              </label>
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                className="w-full border rounded-md px-3 py-2"
+              >
+                {Array.from({ length: 5 }, (_, i) => selectedYear - 2 + i).map(year => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {selectedEmployee && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <div className="text-sm text-blue-600">Vacances</div>
+                <div className="text-2xl font-bold text-blue-700">{stats.vacationDays} jours</div>
+              </div>
+              <div className="bg-yellow-50 p-4 rounded-lg">
+                <div className="text-sm text-yellow-600">Maladie</div>
+                <div className="text-2xl font-bold text-yellow-700">{stats.sickDays} jours</div>
+              </div>
+              <div className="bg-orange-50 p-4 rounded-lg">
+                <div className="text-sm text-orange-600">Formation</div>
+                <div className="text-2xl font-bold text-orange-700">{stats.trainingDays} jours</div>
+              </div>
+              <div className="bg-green-50 p-4 rounded-lg">
+                <div className="text-sm text-green-600">Heures Sup.</div>
+                <div className="text-2xl font-bold text-green-700">{stats.overtimeDays} jours</div>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="text-sm text-gray-600">Congé décès</div>
+                <div className="text-2xl font-bold text-gray-700">{stats.bereavementDays} jours</div>
+              </div>
+              <div className="bg-purple-50 p-4 rounded-lg">
+                <div className="text-sm text-purple-600">Accident</div>
+                <div className="text-2xl font-bold text-purple-700">{stats.accidentDays} jours</div>
+              </div>
+              <div className="bg-indigo-50 p-4 rounded-lg col-span-2">
+                <div className="text-sm text-indigo-600">Total</div>
+                <div className="text-2xl font-bold text-indigo-700">{stats.totalDays} jours</div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Requests Table */}
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           {loading ? (
             <div className="p-6 text-center">
