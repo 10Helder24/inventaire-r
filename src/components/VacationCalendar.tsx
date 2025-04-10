@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Package, LogOut, Calendar, ChevronLeft, ChevronRight, Home, Menu } from 'lucide-react';
+import { LogOut, Calendar, ChevronLeft, ChevronRight, Home, Menu } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { supabase } from '../supabaseClient';
+import { getHolidays, isHoliday } from '../utils/holidays';
 import type { VacationRequest, AbsenceType } from '../types';
 
 interface VacationCalendarProps {
@@ -33,11 +34,9 @@ const TYPE_LABELS: Record<AbsenceType, string> = {
   accident: 'Accident'
 };
 
-// Fonction pour normaliser les noms
 function normalizeName(name: string): { firstName: string; lastName: string } {
   const parts = name.trim().split(/\s+/);
   if (parts.length >= 2) {
-    // Si le nom contient au moins deux parties, on considère la dernière comme le nom de famille
     const lastName = parts.pop() || '';
     const firstName = parts.join(' ');
     return { firstName, lastName };
@@ -45,16 +44,13 @@ function normalizeName(name: string): { firstName: string; lastName: string } {
   return { firstName: '', lastName: name };
 }
 
-// Fonction de comparaison pour le tri
 function compareNames(a: string, b: string): number {
   const nameA = normalizeName(a);
   const nameB = normalizeName(b);
   
-  // D'abord comparer les noms de famille
   const lastNameCompare = nameA.lastName.localeCompare(nameB.lastName, 'fr');
   if (lastNameCompare !== 0) return lastNameCompare;
   
-  // Si les noms de famille sont identiques, comparer les prénoms
   return nameA.firstName.localeCompare(nameB.firstName, 'fr');
 }
 
@@ -66,13 +62,13 @@ export function VacationCalendar({ user, signOut }: VacationCalendarProps) {
   const [loading, setLoading] = useState(true);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const isAdmin = user?.user_metadata?.role === 'admin' || user?.app_metadata?.role === 'admin';
+  const holidays = getHolidays(selectedYear);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         
-        // Get all approved requests
         const { data: requests, error } = await supabase
           .from('vacation_requests')
           .select('*')
@@ -80,14 +76,12 @@ export function VacationCalendar({ user, signOut }: VacationCalendarProps) {
 
         if (error) throw error;
 
-        // Filter requests that overlap with the selected month
         const filteredRequests = (requests || []).filter(request => {
           const requestStart = new Date(request.start_date);
           const requestEnd = new Date(request.end_date);
           const monthStart = new Date(selectedYear, selectedMonth, 1);
           const monthEnd = new Date(selectedYear, selectedMonth + 1, 0);
 
-          // Set times to ensure proper comparison
           monthStart.setHours(0, 0, 0, 0);
           monthEnd.setHours(23, 59, 59, 999);
           requestStart.setHours(0, 0, 0, 0);
@@ -157,13 +151,45 @@ export function VacationCalendar({ user, signOut }: VacationCalendarProps) {
     return request ? { type: request.type, status: request.status } : null;
   };
 
-  // Get unique employees who have vacations in the current month and sort them properly
   const employeesForMonth = Array.from(
     new Set(vacationRequests.map(r => r.name))
   ).sort(compareNames);
 
   const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
   const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+
+  const getDayColor = (day: number) => {
+    const date = new Date(selectedYear, selectedMonth, day);
+    
+    if (isHoliday(date, holidays)) {
+      return 'text-red-600 font-bold';
+    }
+    
+    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+    if (isWeekend) {
+      return 'text-blue-600 font-bold';
+    }
+    
+    return 'text-gray-900';
+  };
+
+  const getCellStyle = (name: string, day: number) => {
+    const date = new Date(selectedYear, selectedMonth, day);
+    const absence = getAbsenceForDay(name, day);
+    
+    if (!absence) return '';
+    
+    if (isHoliday(date, holidays)) {
+      return 'bg-red-200';
+    }
+    
+    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+    if (isWeekend) {
+      return 'bg-gray-100';
+    }
+    
+    return TYPE_COLORS[absence.type];
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -293,7 +319,7 @@ export function VacationCalendar({ user, signOut }: VacationCalendarProps) {
                     <tr>
                       <th className="sticky left-0 z-10 bg-gray-50 border px-2 py-1 text-left">Nom</th>
                       {daysArray.map(day => (
-                        <th key={day} className="border px-2 py-1 text-center w-7">
+                        <th key={day} className={`border px-2 py-1 text-center w-7 ${getDayColor(day)}`}>
                           {day}
                         </th>
                       ))}
@@ -310,7 +336,7 @@ export function VacationCalendar({ user, signOut }: VacationCalendarProps) {
                           return (
                             <td
                               key={day}
-                              className={`border px-2 py-1 text-center ${absence ? TYPE_COLORS[absence.type] : ''}`}
+                              className={`border px-2 py-1 text-center ${getCellStyle(name, day)}`}
                               title={absence ? `${TYPE_LABELS[absence.type]}` : ''}
                             >
                               {absence && '•'}
