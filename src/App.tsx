@@ -15,7 +15,7 @@ import { SortingSheet } from './components/SortingSheet';
 import type { Article } from './types';
 
 function App() {
-  const { user, signOut } = useAuth();
+  const { user, session, signOut } = useAuth();
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const isAdmin = user?.user_metadata?.role === 'admin' || user?.app_metadata?.role === 'admin';
@@ -55,7 +55,7 @@ function App() {
         <Route
           path="/vacation-admin"
           element={
-            user ? (
+            user && session ? (
               isAdmin ? (
                 <VacationAdmin user={user} signOut={signOut} />
               ) : (
@@ -69,10 +69,11 @@ function App() {
         <Route
           path="/manage"
           element={
-            user ? (
+            user && session ? (
               <InventoryManager
                 articles={articles}
                 user={user}
+                session={session}
                 signOut={signOut}
                 onArticleUpdate={loadArticles}
               />
@@ -84,7 +85,7 @@ function App() {
         <Route
           path="/list"
           element={
-            user ? (
+            user && session ? (
               <InventoryList
                 articles={articles}
                 user={user}
@@ -98,7 +99,7 @@ function App() {
         <Route
           path="/sheet"
           element={
-            user ? (
+            user && session ? (
               <InventorySheet
                 articles={articles}
                 user={user}
