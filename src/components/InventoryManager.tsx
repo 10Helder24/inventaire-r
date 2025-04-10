@@ -1,27 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Package, Search, Plus, Save, LogOut, Upload, Trash2, X, FolderOpen, List, FileSpreadsheet, Calendar } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import type { Article } from '../types';
+import { Session } from '@supabase/supabase-js';
 
 interface InventoryManagerProps {
   articles: Article[];
   user: any;
+  session: Session;
   signOut: () => Promise<void>;
   onArticleUpdate: () => void;
 }
 
-export function InventoryManager({ articles, user, signOut, onArticleUpdate }: InventoryManagerProps) {
+export function InventoryManager({ articles, user, session, signOut, onArticleUpdate }: InventoryManagerProps) {
+  const navigate = useNavigate();
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [uploading, setUploading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const { register, handleSubmit, reset, setValue, watch } = useForm();
   const imageUrl = watch('image_url');
-  const navigate = useNavigate();
   const isAdmin = user?.user_metadata?.role === 'admin' || user?.app_metadata?.role === 'admin';
+
+  useEffect(() => {
+    // Verify session validity on component mount and periodically
+    const checkSession = async () => {
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      
+      // If no session or session ID doesn't match, redirect to login
+      if (!currentSession || currentSession.access_token !== session.access_token) {
+        await signOut();
+        navigate('/login');
+      }
+    };
+
+    checkSession();
+    
+    // Check session every minute
+    const interval = setInterval(checkSession, 60000);
+    
+    return () => clearInterval(interval);
+  }, [session, signOut, navigate]);
 
   const categories = ['all', ...new Set(articles.map(article => article.category))].filter(Boolean);
 
